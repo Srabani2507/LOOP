@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, Bell, ChevronDown, Circle } from 'lucide-react'
+import { Search, Bell, ChevronDown } from 'lucide-react'
 
 export function TopNavbar() {
   return (
@@ -26,7 +26,7 @@ export function TopNavbar() {
           <div className="h-8 w-px bg-border" />
 
           <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
-            <Circle className="h-8 w-8 fill-chart-1 text-chart-1" />
+            <div className="h-8 w-8 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #2e4391 0%, #59329c 50%, #8529bd 100%)' }} />
             <div className="text-left">
               <p className="text-sm font-medium">Alex Rivera</p>
               <p className="text-xs text-muted-foreground">Admin</p>
