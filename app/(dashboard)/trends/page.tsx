@@ -1,6 +1,6 @@
-import { themesData, chartData } from '@/lib/mock-data'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { TrendingUp, AlertCircle, BarChart3 } from 'lucide-react'
+import { themesData } from '@/lib/mock-data'
+import { ThemeGrowthChart } from '@/components/charts/theme-growth-chart'
+import { AlertCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 export const metadata = {
@@ -19,23 +19,7 @@ export default function TrendsPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
             <h2 className="text-lg font-semibold mb-4">Theme Growth Trends</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="month" stroke="var(--muted-foreground)" />
-                <YAxis stroke="var(--muted-foreground)" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--card)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                  }}
-                />
-                <Line type="monotone" dataKey="positive" stroke="var(--chart-2)" strokeWidth={2} />
-                <Line type="monotone" dataKey="negative" stroke="var(--chart-3)" strokeWidth={2} />
-                <Line type="monotone" dataKey="neutral" stroke="var(--chart-4)" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+            <ThemeGrowthChart />
           </div>
 
           <div className="space-y-4">
