@@ -2,10 +2,11 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartData } from '@/lib/mock-data'
+import { Card } from '@/components/ui/card'
 
 export function VolumeChart() {
   return (
-    <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+    <Card className="p-6">
       <h3 className="mb-4 font-semibold">Feedback Volume</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
@@ -29,6 +30,7 @@ export function VolumeChart() {
           <Bar dataKey="volume" fill="url(#barGradient)" radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   )
 }
+

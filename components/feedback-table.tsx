@@ -1,6 +1,7 @@
 import { feedbackTableData } from '@/lib/mock-data'
 import { Badge } from '@/components/ui/badge'
 import { MoreVertical } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 
 const sentimentColors = {
   positive: 'bg-chart-2/10 text-chart-2 border-chart-2/20',
@@ -10,7 +11,7 @@ const sentimentColors = {
 
 export function FeedbackTable() {
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm">
+    <Card>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -49,6 +50,7 @@ export function FeedbackTable() {
           </tbody>
         </table>
       </div>
-    </div>
+    </Card>
   )
 }
+

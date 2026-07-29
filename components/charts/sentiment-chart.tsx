@@ -2,12 +2,13 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import { sentimentData } from '@/lib/mock-data'
+import { Card } from '@/components/ui/card'
 
 const COLORS = ['var(--chart-2)', 'var(--chart-4)', 'var(--chart-3)']
 
 export function SentimentChart() {
   return (
-    <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+    <Card className="p-6">
       <h3 className="mb-4 font-semibold">Sentiment Breakdown</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
@@ -34,6 +35,7 @@ export function SentimentChart() {
           />
         </PieChart>
       </ResponsiveContainer>
-    </div>
+    </Card>
   )
 }
+
