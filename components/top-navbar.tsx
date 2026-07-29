@@ -1,8 +1,32 @@
 'use client'
 
-import { Search, Bell, ChevronDown } from 'lucide-react'
+import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export function TopNavbar() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const isDark = document.documentElement.classList.contains('dark')
+    setTheme(isDark ? 'dark' : 'light')
+  }, [])
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(nextTheme)
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+      document.documentElement.classList.remove('light')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.add('light')
+      localStorage.setItem('theme', 'light')
+    }
+  }
+
   return (
     <header className="fixed left-64 right-0 top-0 z-30 border-b border-border bg-card/50 backdrop-blur-sm">
       <div className="flex items-center justify-between px-6 py-4">
@@ -18,7 +42,23 @@ export function TopNavbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="relative rounded-lg p-2 hover:bg-muted">
+          <button
+            onClick={toggleTheme}
+            className="rounded-lg p-2 hover:bg-muted text-foreground/60 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {mounted ? (
+              theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )
+            ) : (
+              <div className="h-5 w-5" />
+            )}
+          </button>
+
+          <button className="relative rounded-lg p-2 hover:bg-muted" aria-label="Notifications">
             <Bell className="h-5 w-5 text-foreground/60" />
             <div className="absolute right-1 top-1 h-2 w-2 rounded-full bg-chart-3" />
           </button>
@@ -38,3 +78,4 @@ export function TopNavbar() {
     </header>
   )
 }
+
