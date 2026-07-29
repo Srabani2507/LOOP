@@ -3,11 +3,30 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Save, Copy, Eye, EyeOff, Moon, Sun } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function SettingsPage() {
   const [showApiKey, setShowApiKey] = useState(false)
   const [theme, setTheme] = useState('light')
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'auto'
+    setTheme(savedTheme)
+  }, [])
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+      document.documentElement.classList.remove('light')
+    } else if (newTheme === 'light') {
+      document.documentElement.classList.add('light')
+      document.documentElement.classList.remove('dark')
+    } else {
+      document.documentElement.classList.remove('dark', 'light')
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -84,7 +103,7 @@ export default function SettingsPage() {
                 ].map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setTheme(option.value)}
+                    onClick={() => handleThemeChange(option.value)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                       theme === option.value
                         ? 'border-primary bg-primary/10 text-primary'
