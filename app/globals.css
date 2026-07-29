@@ -55,7 +55,10 @@
   --popover-foreground: oklch(0.11 0 0);
   --primary: #331963;
   --primary-foreground: oklch(1 0 0);
-  --primary-gradient: linear-gradient(135deg, #182761 0%, #401d80 50%, #4c0879 100%);
+  --primary-gradient-start: #182761;
+  --primary-gradient-mid: #401d80;
+  --primary-gradient-end: #4c0879;
+  --primary-gradient: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
   --secondary: oklch(0.96 0 0);
   --secondary-foreground: oklch(0.11 0 0);
   --muted: oklch(0.92 0 0);
@@ -92,7 +95,10 @@
   --popover-foreground: oklch(0.98 0 0);
   --primary: #8b2fc9;
   --primary-foreground: oklch(1 0 0);
-  --primary-gradient: linear-gradient(135deg, #1a2a6c 0%, #3a1c71 50%, #8b2fc9 100%);
+  --primary-gradient-start: #1a2a6c;
+  --primary-gradient-mid: #3a1c71;
+  --primary-gradient-end: #8b2fc9;
+  --primary-gradient: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
   --secondary: oklch(0.22 0 0);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.26 0 0);
@@ -129,7 +135,10 @@
     --popover-foreground: oklch(0.98 0 0);
     --primary: #8b2fc9;
     --primary-foreground: oklch(1 0 0);
-    --primary-gradient: linear-gradient(135deg, #1a2a6c 0%, #3a1c71 50%, #8b2fc9 100%);
+    --primary-gradient-start: #1a2a6c;
+    --primary-gradient-mid: #3a1c71;
+    --primary-gradient-end: #8b2fc9;
+    --primary-gradient: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
     --secondary: oklch(0.22 0 0);
     --secondary-foreground: oklch(0.98 0 0);
     --muted: oklch(0.26 0 0);

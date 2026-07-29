@@ -6,10 +6,11 @@ export interface StatsCardProps {
   label: string
   value: string | number
   trend?: number
+  trendLabel?: string
   icon?: React.ReactNode
 }
 
-export function StatsCard({ label, value, trend, icon }: StatsCardProps) {
+export function StatsCard({ label, value, trend, trendLabel, icon }: StatsCardProps) {
   const isPositive = trend !== undefined && trend > 0
 
   return (
@@ -50,7 +51,7 @@ export function StatsCard({ label, value, trend, icon }: StatsCardProps) {
                 {Math.abs(trend)}%
               </span>
             </div>
-            <span className="text-xs text-muted-foreground">from last week</span>
+            <span className="text-xs text-muted-foreground">{trendLabel || 'from last week'}</span>
           </div>
         )}
       </div>

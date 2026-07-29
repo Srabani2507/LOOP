@@ -72,16 +72,13 @@ export default function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-6">
           {themesData.map((theme) => (
-            <Card
+            <StatsCard
               key={theme.theme}
-              className="p-4 hover:shadow-md transition-shadow"
-            >
-              <p className="text-sm font-medium text-muted-foreground">{theme.theme}</p>
-              <p className="mt-2 text-2xl font-semibold">{theme.count.toLocaleString()}</p>
-              <p className={`mt-2 text-xs font-medium ${theme.trend > 0 ? 'text-chart-2' : 'text-chart-3'}`}>
-                {theme.trend > 0 ? '↑' : '↓'} {Math.abs(theme.trend)}% this week
-              </p>
-            </Card>
+              label={theme.theme}
+              value={theme.count}
+              trend={theme.trend}
+              trendLabel="this week"
+            />
           ))}
         </div>
       </div>
