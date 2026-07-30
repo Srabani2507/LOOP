@@ -17,7 +17,7 @@ export function VolumeChart() {
               <stop offset="100%" stopColor="#8b2fc9" />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--foreground)" strokeOpacity={0.15} />
           <XAxis dataKey="month" stroke="var(--muted-foreground)" />
           <YAxis stroke="var(--muted-foreground)" />
           <Tooltip

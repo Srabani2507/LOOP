@@ -14,10 +14,10 @@ export const metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-muted-foreground">Welcome back! Here&apos;s your feedback overview.</p>
+        {/* <p className="mt-1 text-muted-foreground">Welcome back! Here&apos;s your feedback overview.</p> */}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
