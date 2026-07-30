@@ -268,37 +268,20 @@ export function Sidebar() {
       {/* Mobile backdrop overlay */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 top-20 bg-black/50 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen w-64 flex flex-col transition-transform duration-300",
+          "fixed left-0 top-20 bottom-0 z-40 w-64 flex flex-col transition-transform duration-300",
           "bg-background/20 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none",
           isMobile && !isOpen && "-translate-x-full",
           isMobile && isOpen && "translate-x-0"
         )}
       >
-        <div className="flex h-full flex-col p-4 gap-4 overflow-hidden">
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-2 pt-2">
-            <div className="flex flex-col">
-              <h1 className="font-bold text-2xl text-foreground">LOOP</h1>
-              <p className="text-xs text-muted-foreground">Customer Feedback AI</p>
-            </div>
-            {isMobile && (
-              <button
-                onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 hover:bg-muted text-foreground/60 transition-colors"
-                aria-label="Close sidebar"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+        <div className="flex h-full flex-col p-4 gap-4 overflow-hidden pt-2">
 
           {/* Navigation Scroll Area */}
           <div className="flex-1 overflow-y-auto min-h-0 space-y-0 pr-1 -mr-1">
