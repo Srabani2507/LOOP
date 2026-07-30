@@ -1,12 +1,13 @@
 'use client'
 
-import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react'
+import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import { useSidebar } from '@/lib/sidebar-context'
 
 export function TopNavbar() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [mounted, setMounted] = useState(false)
+  const { toggle } = useSidebar()
 
   useEffect(() => {
     setMounted(true)
@@ -29,10 +30,17 @@ export function TopNavbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 relative overflow-hidden rounded-b-4xl flex h-20 items-center justify-between border-b-2 border-primary/20 bg-card/25 backdrop-blur-md px-4 lg:px-6 shadow-lg shadow-primary/5 w-full">
+    <header className="sticky top-0 z-30 relative overflow-hidden rounded-b-4xl flex h-20 items-center justify-between border-b-2 border-primary/20 bg-card/25 backdrop-blur-md px-4 lg:px-6 shadow-lg shadow-primary/5 w-full">
       <span className="absolute inset-0 bg-primary-gradient opacity-[0.07] dark:opacity-[0.10] pointer-events-none" />
       <div className="relative z-10 flex flex-1 items-center gap-4">
-        <SidebarTrigger className="-ml-1 mr-2 text-foreground/70 hover:text-foreground" />
+        {/* Hamburger — visible on mobile, hidden on desktop since sidebar is always open */}
+        <button
+          onClick={toggle}
+          className="lg:hidden -ml-1 mr-2 rounded-lg p-2 text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -81,4 +89,3 @@ export function TopNavbar() {
     </header>
   )
 }
-
