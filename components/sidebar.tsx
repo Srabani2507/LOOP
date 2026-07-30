@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -12,7 +13,21 @@ import {
   Settings,
   LogOut,
 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
+import {
+  Sidebar as SidebarPrimitive,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from '@/components/ui/sidebar'
 
 const navigationItems = [
   {
@@ -54,43 +69,74 @@ const navigationItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { state } = useSidebar()
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar p-4 pt-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-sidebar-primary">LOOP</h1>
-        <p className="text-xs text-sidebar-foreground/60">Customer Feedback AI</p>
-      </div>
+    <SidebarPrimitive collapsible="icon">
+      <SidebarHeader className="py-6 px-4">
+        <div className="flex flex-col">
+          <h1 className={cn(
+            'font-bold text-sidebar-primary transition-all duration-200',
+            state === 'collapsed' ? 'text-xl text-center' : 'text-2xl'
+          )}>
+            {state === 'collapsed' ? 'L' : 'LOOP'}
+          </h1>
+          {state !== 'collapsed' && (
+            <p className="text-xs text-sidebar-foreground/60 transition-opacity duration-200">
+              Customer Feedback AI
+            </p>
+          )}
+        </div>
+      </SidebarHeader>
 
-      <nav className="space-y-2">
-        {navigationItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname?.startsWith(item.href)
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navigationItems.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname?.startsWith(item.href)
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all',
-                isActive
-                  ? 'bg-primary-gradient text-white shadow-sm'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
-              )}
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.name}
+                      className={cn(
+                        'transition-all duration-200',
+                        isActive
+                          ? 'bg-primary-gradient text-white shadow-sm hover:opacity-90 [&_svg]:text-white [&_span]:text-white'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+                      )}
+                    >
+                      <Link href={item.href}>
+                        <Icon className="h-5 w-5" />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Sign Out"
+              className="text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
             >
-              <Icon className="h-5 w-5" />
-              <span>{item.name}</span>
-            </Link>
-          )
-        })}
-      </nav>
-
-      <div className="absolute bottom-4 left-4 right-4">
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent/50">
-          <LogOut className="h-5 w-5" />
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </aside>
+              <LogOut className="h-5 w-5" />
+              <span>Sign Out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </SidebarPrimitive>
   )
 }

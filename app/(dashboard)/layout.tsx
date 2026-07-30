@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/sidebar'
 import { TopNavbar } from '@/components/top-navbar'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 
 export default function DashboardLayout({
   children,
@@ -7,12 +8,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-background">
+    <SidebarProvider>
       <Sidebar />
-      <TopNavbar />
-      <main className="ml-64 pt-20 p-6 min-h-screen">
-        {children}
-      </main>
-    </div>
+      <SidebarInset className="bg-background">
+        <TopNavbar />
+        <main className="p-6 min-h-screen">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
