@@ -29,8 +29,9 @@ export function TopNavbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 rounded-b-4xl flex h-20 items-center justify-between border-b-2 border-primary/20 bg-card/40 backdrop-blur-md px-4 lg:px-6 shadow-lg shadow-primary/5 w-full">
-      <div className="flex flex-1 items-center gap-4">
+    <header className="sticky top-0 z-50 relative overflow-hidden rounded-b-4xl flex h-20 items-center justify-between border-b-2 border-primary/20 bg-card/25 backdrop-blur-md px-4 lg:px-6 shadow-lg shadow-primary/5 w-full">
+      <span className="absolute inset-0 bg-primary-gradient opacity-[0.07] dark:opacity-[0.10] pointer-events-none" />
+      <div className="relative z-10 flex flex-1 items-center gap-4">
         <SidebarTrigger className="-ml-1 mr-2 text-foreground/70 hover:text-foreground" />
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -42,7 +43,7 @@ export function TopNavbar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="relative z-10 flex items-center gap-2 lg:gap-3">
         <button
           onClick={toggleTheme}
           className="rounded-lg p-2 hover:bg-muted text-foreground/60 transition-colors"
