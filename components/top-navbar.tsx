@@ -46,7 +46,7 @@ export function TopNavbar() {
         {/* LOOP Header */}
         <div className="flex items-center gap-0 mr-4 w-80 lg:w-72 shrink-0">
           <Image src="/LOOP-logo.svg" alt="LOOP Logo" width={60} height={60} className="h-12 w-auto relative z-10" priority />
-          <Image src="/LOOP-text.svg" alt="LOOP Text" width={100} height={28} className="h-14 w-auto -ml-4" priority />
+          <Image src="/LOOP-text.svg" alt="LOOP Text" width={100} height={28} className="h-14 w-auto -ml-8" priority />
         </div>
 
         <div className="relative flex-1 max-w-xs">
