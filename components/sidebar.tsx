@@ -104,15 +104,18 @@ export function Sidebar() {
                       isActive={isActive}
                       tooltip={item.name}
                       className={cn(
-                        'transition-all duration-200',
+                        'relative overflow-hidden transition-all duration-200',
                         isActive
-                          ? 'bg-primary-gradient text-white shadow-sm hover:opacity-90 [&_svg]:text-white [&_span]:text-white'
+                          ? '!bg-card text-foreground font-medium shadow-sm hover:opacity-95'
                           : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
                       )}
                     >
                       <Link href={item.href}>
-                        <Icon className="h-5 w-5" />
-                        <span>{item.name}</span>
+                        {isActive && (
+                          <span className="absolute inset-0 bg-primary-gradient opacity-[0.38] dark:opacity-[0.22] pointer-events-none rounded-md" />
+                        )}
+                        <Icon className="relative z-10 h-5 w-5" />
+                        <span className="relative z-10">{item.name}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

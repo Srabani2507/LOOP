@@ -95,9 +95,9 @@
   --popover-foreground: oklch(0.98 0 0);
   --primary: #8b2fc9;
   --primary-foreground: oklch(1 0 0);
-  --primary-gradient-start: #1a2a6c;
-  --primary-gradient-mid: #3a1c71;
-  --primary-gradient-end: #8b2fc9;
+  --primary-gradient-start: #3547b8;
+  --primary-gradient-mid: #6b35c4;
+  --primary-gradient-end: #a855d4;
   --primary-gradient: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
   --secondary: oklch(0.22 0 0);
   --secondary-foreground: oklch(0.98 0 0);
@@ -135,9 +135,9 @@
     --popover-foreground: oklch(0.98 0 0);
     --primary: #8b2fc9;
     --primary-foreground: oklch(1 0 0);
-    --primary-gradient-start: #1a2a6c;
-    --primary-gradient-mid: #3a1c71;
-    --primary-gradient-end: #8b2fc9;
+    --primary-gradient-start: #3547b8;
+    --primary-gradient-mid: #6b35c4;
+    --primary-gradient-end: #a855d4;
     --primary-gradient: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
     --secondary: oklch(0.22 0 0);
     --secondary-foreground: oklch(0.98 0 0);

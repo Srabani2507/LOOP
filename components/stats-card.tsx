@@ -21,7 +21,7 @@ export function StatsCard({ label, value, trend, trendLabel, icon }: StatsCardPr
       {/* Small Watermark Icon/Logo at Bottom Right (fully visible inside card margins) */}
       {icon && (
         <div className="absolute bottom-3 right-3 w-9 h-9 text-primary opacity-[0.22] dark:opacity-[0.32] pointer-events-none z-0 transition-transform duration-300 group-hover:scale-110">
-          {React.cloneElement(icon as React.ReactElement, { className: 'w-full h-full' })}
+          {React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className: 'w-full h-full' })}
         </div>
       )}
 
