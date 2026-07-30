@@ -1,0 +1,15 @@
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#182761" />
+      <stop offset="50%" stop-color="#401d80" />
+      <stop offset="100%" stop-color="#4c0879" />
+    </linearGradient>
+  </defs>
+  <!-- Centered via transform translation to exact midpoint (25, 25) -->
+  <g transform="translate(5, 5)">
+    <path d="M 12 20 C 12 11, 20 11, 25 20 C 30 29, 38 29, 38 20 C 38 11, 30 11, 25 20 C 20 29, 12 29, 12 20 Z" stroke="url(#primaryGradient)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="38" cy="20" r="3.5" fill="#4c0879" />
+    <circle cx="12" cy="20" r="2" fill="#182761" />
+  </g>
+</svg>

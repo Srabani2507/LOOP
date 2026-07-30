@@ -2,6 +2,7 @@
 
 import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useSidebar } from '@/lib/sidebar-context'
 
 export function TopNavbar() {
@@ -43,9 +44,9 @@ export function TopNavbar() {
         </button>
 
         {/* LOOP Header */}
-        <div className="flex flex-col mr-4 w-60 lg:w-56 shrink-0">
-          <h1 className="font-bold text-2xl text-foreground">LOOP</h1>
-          <p className="text-xs text-muted-foreground whitespace-nowrap">Customer Feedback AI</p>
+        <div className="flex items-center gap-0 mr-4 w-80 lg:w-72 shrink-0">
+          <Image src="/LOOP-logo.svg" alt="LOOP Logo" width={60} height={60} className="h-12 w-auto relative z-10" priority />
+          <Image src="/LOOP-text.svg" alt="LOOP Text" width={100} height={28} className="h-14 w-auto -ml-4" priority />
         </div>
 
         <div className="relative flex-1 max-w-xs">
