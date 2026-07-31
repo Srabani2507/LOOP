@@ -9,12 +9,20 @@ import { prisma } from "@/lib/db";
 import { CreateFeedbackSchema } from "@/lib/validators/feedback";
 
 
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+
 // =========================
 // GET /api/feedback
 // =========================
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !(session.user as any)?.workspaceId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const workspaceId = (session.user as any).workspaceId;
     const searchParams = request.nextUrl.searchParams;
 
     const page = Number(searchParams.get("page")) || 1;
@@ -28,13 +36,9 @@ export async function GET(request: NextRequest) {
 
     const channel = searchParams.get("channel") as FeedbackChannel | null;
 
-    const workspaceId = searchParams.get("workspaceId");
-
-    const where: any = {};
-
-    if (workspaceId) {
-      where.workspaceId = workspaceId;
-    }
+    const where: any = {
+      workspaceId,
+    };
 
     if (status) {
       where.status = status;
@@ -128,6 +132,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !(session.user as any)?.workspaceId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const userWorkspaceId = (session.user as any).workspaceId;
     const body = await request.json();
 
     const result = CreateFeedbackSchema.safeParse(body);
@@ -149,7 +158,6 @@ export async function POST(request: NextRequest) {
       channel,
       customerLabel,
       externalReference,
-      workspaceId,
       sentiment,
       sentimentScore,
       status,
@@ -157,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     const workspace = await prisma.workspace.findUnique({
       where: {
-        id: workspaceId,
+        id: userWorkspaceId,
       },
     });
 
@@ -178,7 +186,7 @@ export async function POST(request: NextRequest) {
         channel,
         customerLabel,
         externalReference,
-        workspaceId,
+        workspaceId: userWorkspaceId,
         sentiment,
         sentimentScore,
         status,

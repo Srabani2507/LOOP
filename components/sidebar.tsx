@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/lib/sidebar-context"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
@@ -263,6 +264,11 @@ export function Sidebar() {
     if (isMobile) setIsOpen(false)
   }
 
+  const handleSignOut = async () => {
+    await signOut({ redirect: false, callbackUrl: "/login" })
+    window.location.href = "/login"
+  }
+
   return (
     <>
       {/* Mobile backdrop overlay */}
@@ -315,6 +321,7 @@ export function Sidebar() {
                   Profile
                 </Link>
                 <button
+                  onClick={handleSignOut}
                   className="flex items-center justify-center gap-1.5 h-8 rounded-xl text-sm font-normal bg-destructive/20 text-destructive hover:bg-destructive/35 transition-colors cursor-pointer"
                 >
                   <LogOut className="h-3.5 w-3.5" />

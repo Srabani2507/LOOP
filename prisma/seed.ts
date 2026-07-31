@@ -1,6 +1,7 @@
 import { PrismaClient } from "../lib/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -10,6 +11,14 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Starting database seed...");
+
+  // Clean up existing data to prevent duplicates
+  await prisma.report.deleteMany();
+  await prisma.feedbackTheme.deleteMany();
+  await prisma.feedback.deleteMany();
+  await prisma.theme.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.workspace.deleteMany();
 
   // 1. Create Workspace
   const workspace = await prisma.workspace.upsert({
@@ -24,6 +33,7 @@ async function main() {
   // 2. Create 5 Users
   const roles = ["ADMIN", "ANALYST", "ANALYST", "VIEWER", "VIEWER"];
   const users = [];
+  const hashedPassword = await bcrypt.hash("password123", 10);
   for (let i = 0; i < 5; i++) {
     const user = await prisma.user.upsert({
       where: { email: `user${i + 1}@demo.com` },
@@ -31,7 +41,7 @@ async function main() {
       create: {
         name: `User ${i + 1}`,
         email: `user${i + 1}@demo.com`,
-        passwordHash: "hashed-password",
+        passwordHash: hashedPassword,
         role: roles[i] as any,
         workspaceId: workspace.id,
       },
@@ -110,6 +120,7 @@ async function main() {
         sentimentScore: sentiment === "POSITIVE" ? 0.8 : (sentiment === "NEGATIVE" ? -0.8 : 0),
         status: status as any,
         customerLabel: `Customer ${Math.floor(Math.random() * 50) + 1}`,
+        externalReference: `REF-${Math.floor(Math.random() * 10000)}`,
         workspaceId: workspace.id,
         createdAt: pastDate,
       },
