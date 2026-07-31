@@ -24,3 +24,4 @@ node_modules
 # Uncomment the line below if you don't want to commit agent skills/rules
 # .agents/
 # skills-lock.json
+/lib/generated/prisma
