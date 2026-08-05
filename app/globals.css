@@ -179,4 +179,12 @@
   .bg-primary-gradient {
     background: var(--primary-gradient);
   }
+  .text-primary-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
 }
+
