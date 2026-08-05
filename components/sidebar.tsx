@@ -4,7 +4,7 @@ import type React from "react"
 import { useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/lib/sidebar-context"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
@@ -234,6 +234,17 @@ function NavList({
    Main Sidebar
 ───────────────────────────────────────────── */
 export function Sidebar() {
+  const sessionData = useSession();
+  const session = sessionData?.data;
+  const userName = session?.user?.name || "User";
+  const userRole = (session?.user as any)?.role || "Member";
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U";
+
   const pathname = usePathname()
   const { isOpen, setIsOpen, isMobile } = useSidebar()
 
@@ -304,11 +315,11 @@ export function Sidebar() {
             <div className="bg-card rounded-2xl p-4 space-y-2 border border-border/50">
               <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-muted/80">
                 <div className="shrink-0 h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary/80 border border-primary/20 text-sm">
-                  AR
+                  {initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">Alex Rivera</p>
-                  <p className="text-xs text-muted-foreground truncate">Admin</p>
+                  <p className="text-sm font-medium truncate">{userName}</p>
+                  <p className="text-xs text-muted-foreground truncate capitalize">{userRole.toLowerCase()}</p>
                 </div>
               </div>
 

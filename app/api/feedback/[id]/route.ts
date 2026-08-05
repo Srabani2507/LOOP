@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { UpdateFeedbackSchema } from "@/lib/validators/feedback";
+import { requireAuth } from "@/lib/rbac";
+import { UserRole } from "@/lib/generated/prisma/client";
 
 // =========================
 // PATCH /api/feedback/[id]
@@ -10,6 +12,10 @@ export async function PATCH(
   context: any
 ) {
   try {
+    const authResult = await requireAuth([UserRole.ADMIN, UserRole.ANALYST]);
+    if ("response" in authResult) return authResult.response;
+    const { workspaceId } = authResult.auth;
+
     const params = await context.params;
     const id = params.id;
 
@@ -26,14 +32,14 @@ export async function PATCH(
       );
     }
 
-    // Verify feedback exists before updating
-    const existingFeedback = await prisma.feedback.findUnique({
-      where: { id },
+    // Verify feedback exists AND belongs to user's workspace
+    const existingFeedback = await prisma.feedback.findFirst({
+      where: { id, workspaceId },
     });
 
     if (!existingFeedback) {
       return NextResponse.json(
-        { message: "Feedback not found" },
+        { message: "Feedback not found in your workspace" },
         { status: 404 }
       );
     }
@@ -78,23 +84,37 @@ export async function DELETE(
   context: any
 ) {
   try {
+    // Only ADMIN can delete feedback
+    const authResult = await requireAuth([UserRole.ADMIN]);
+    if ("response" in authResult) return authResult.response;
+    const { workspaceId } = authResult.auth;
+
     const params = await context.params;
     const id = params.id;
 
-    // Verify feedback exists before deleting
-    const existingFeedback = await prisma.feedback.findUnique({
-      where: { id },
+    // Verify feedback exists AND belongs to user's workspace
+    const existingFeedback = await prisma.feedback.findFirst({
+      where: { id, workspaceId },
     });
 
     if (!existingFeedback) {
       return NextResponse.json(
-        { message: "Feedback not found" },
+        { message: "Feedback not found in your workspace" },
         { status: 404 }
       );
     }
 
-    await prisma.feedback.delete({
-      where: { id },
+    // Safely delete associated FeedbackTheme and Embedding relations before deleting Feedback
+    await prisma.$transaction(async (tx) => {
+      await tx.feedbackTheme.deleteMany({
+        where: { feedbackId: id },
+      });
+      await tx.embedding.deleteMany({
+        where: { feedbackId: id },
+      });
+      await tx.feedback.delete({
+        where: { id },
+      });
     });
 
     return NextResponse.json(

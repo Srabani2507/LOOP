@@ -3,37 +3,27 @@ import {
   FeedbackChannel,
   FeedbackStatus,
   Sentiment,
+  UserRole,
 } from "@/lib/generated/prisma/client";
-
 import { prisma } from "@/lib/db";
 import { CreateFeedbackSchema } from "@/lib/validators/feedback";
-
-
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAuth } from "@/lib/rbac";
 
 // =========================
 // GET /api/feedback
 // =========================
-
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any)?.workspaceId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    const workspaceId = (session.user as any).workspaceId;
-    const searchParams = request.nextUrl.searchParams;
+    const authResult = await requireAuth();
+    if ("response" in authResult) return authResult.response;
+    const { workspaceId } = authResult.auth;
 
+    const searchParams = request.nextUrl.searchParams;
     const page = Number(searchParams.get("page")) || 1;
     const limit = Number(searchParams.get("limit")) || 10;
-
     const search = searchParams.get("search") || "";
-
     const status = searchParams.get("status") as FeedbackStatus | null;
-
     const sentiment = searchParams.get("sentiment") as Sentiment | null;
-
     const channel = searchParams.get("channel") as FeedbackChannel | null;
 
     const where: any = {
@@ -43,15 +33,12 @@ export async function GET(request: NextRequest) {
     if (status) {
       where.status = status;
     }
-
     if (sentiment) {
       where.sentiment = sentiment;
     }
-
     if (channel) {
       where.channel = channel;
     }
-
     if (search) {
       where.OR = [
         {
@@ -69,21 +56,15 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const total = await prisma.feedback.count({
-      where,
-    });
+    const total = await prisma.feedback.count({ where });
 
     const feedback = await prisma.feedback.findMany({
       where,
-
       orderBy: {
         createdAt: "desc",
       },
-
       skip: (page - 1) * limit,
-
       take: limit,
-
       select: {
         id: true,
         content: true,
@@ -94,7 +75,6 @@ export async function GET(request: NextRequest) {
         sentimentScore: true,
         status: true,
         createdAt: true,
-
         workspace: {
           select: {
             id: true,
@@ -112,33 +92,25 @@ export async function GET(request: NextRequest) {
       data: feedback,
     });
   } catch (error) {
-    console.error(error);
-
+    console.error("Error fetching feedback:", error);
     return NextResponse.json(
-      {
-        message: "Failed to fetch feedback",
-      },
-      {
-        status: 500,
-      }
+      { message: "Failed to fetch feedback" },
+      { status: 500 }
     );
   }
 }
 
-
 // =========================
 // POST /api/feedback
 // =========================
-
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any)?.workspaceId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    const userWorkspaceId = (session.user as any).workspaceId;
-    const body = await request.json();
+    // Only ADMIN and ANALYST can create feedback
+    const authResult = await requireAuth([UserRole.ADMIN, UserRole.ANALYST]);
+    if ("response" in authResult) return authResult.response;
+    const { workspaceId } = authResult.auth;
 
+    const body = await request.json();
     const result = CreateFeedbackSchema.safeParse(body);
 
     if (!result.success) {
@@ -147,9 +119,7 @@ export async function POST(request: NextRequest) {
           message: "Validation failed",
           errors: result.error.flatten(),
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
@@ -163,35 +133,17 @@ export async function POST(request: NextRequest) {
       status,
     } = result.data;
 
-    const workspace = await prisma.workspace.findUnique({
-      where: {
-        id: userWorkspaceId,
-      },
-    });
-
-    if (!workspace) {
-      return NextResponse.json(
-        {
-          message: "Workspace not found",
-        },
-        {
-          status: 404,
-        }
-      );
-    }
-
     const feedback = await prisma.feedback.create({
       data: {
         content,
         channel,
         customerLabel,
         externalReference,
-        workspaceId: userWorkspaceId,
+        workspaceId,
         sentiment,
         sentimentScore,
         status,
       },
-
       select: {
         id: true,
         content: true,
@@ -202,7 +154,6 @@ export async function POST(request: NextRequest) {
         sentimentScore: true,
         status: true,
         createdAt: true,
-
         workspace: {
           select: {
             id: true,
@@ -212,19 +163,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(feedback, {
-      status: 201,
-    });
+    return NextResponse.json(feedback, { status: 201 });
   } catch (error) {
-    console.error(error);
-
+    console.error("Error creating feedback:", error);
     return NextResponse.json(
-      {
-        message: "Failed to create feedback",
-      },
-      {
-        status: 500,
-      }
+      { message: "Failed to create feedback" },
+      { status: 500 }
     );
   }
 }

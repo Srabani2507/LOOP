@@ -4,8 +4,20 @@ import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useSidebar } from '@/lib/sidebar-context'
+import { useSession } from 'next-auth/react'
 
 export function TopNavbar() {
+  const sessionData = useSession()
+  const session = sessionData?.data
+  const userName = session?.user?.name || "User"
+  const userRole = (session?.user as any)?.role || "Member"
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U"
+
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [mounted, setMounted] = useState(false)
   const { toggle } = useSidebar()
@@ -86,10 +98,12 @@ export function TopNavbar() {
         <div className="h-8 w-px bg-border" />
 
         <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
-          <div className="h-8 w-8 rounded-full shadow-sm" style={{ background: 'linear-gradient(135deg, #2e4391 0%, #59329c 50%, #8529bd 100%)' }} />
+          <div className="h-8 w-8 rounded-full shadow-sm bg-primary/20 text-primary border border-primary/20 font-bold text-xs flex items-center justify-center">
+            {initials}
+          </div>
           <div className="text-left hidden sm:block">
-            <p className="text-sm font-medium">Alex Rivera</p>
-            <p className="text-xs text-muted-foreground">Admin</p>
+            <p className="text-sm font-medium">{userName}</p>
+            <p className="text-xs text-muted-foreground capitalize">{userRole.toLowerCase()}</p>
           </div>
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </button>

@@ -234,7 +234,7 @@ export default function LoginPage() {
                       <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-foreground/80">
                         Password
                       </label>
-                      <a href="#" onClick={(e) => { e.preventDefault(); alert("Password reset link has been requested."); }} className="text-xs font-medium text-primary hover:underline">
+                      <a href="#" onClick={(e) => { e.preventDefault(); setError("Password reset feature is currently disabled. Please contact your workspace Administrator."); }} className="text-xs font-medium text-primary hover:underline">
                         Forgot password?
                       </a>
                     </div>
