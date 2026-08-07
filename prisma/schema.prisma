@@ -66,6 +66,8 @@
 
   enum FeedbackStatus {
     NEW
+    REVIEWED
+    ACTIONED
     PROCESSING
     ANALYZED
     FAILED

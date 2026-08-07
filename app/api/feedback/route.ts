@@ -25,6 +25,9 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status") as FeedbackStatus | null;
     const sentiment = searchParams.get("sentiment") as Sentiment | null;
     const channel = searchParams.get("channel") as FeedbackChannel | null;
+    const themeId = searchParams.get("themeId") || "";
+    const dateFrom = searchParams.get("dateFrom") || "";
+    const dateTo = searchParams.get("dateTo") || "";
 
     const where: any = {
       workspaceId,
@@ -38,6 +41,20 @@ export async function GET(request: NextRequest) {
     }
     if (channel) {
       where.channel = channel;
+    }
+    if (themeId) {
+      where.themes = {
+        some: { themeId },
+      };
+    }
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+      if (dateTo) {
+        const to = new Date(dateTo);
+        to.setHours(23, 59, 59, 999);
+        where.createdAt.lte = to;
+      }
     }
     if (search) {
       where.OR = [
@@ -75,6 +92,18 @@ export async function GET(request: NextRequest) {
         sentimentScore: true,
         status: true,
         createdAt: true,
+        themes: {
+          select: {
+            confidence: true,
+            theme: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
+          },
+        },
         workspace: {
           select: {
             id: true,

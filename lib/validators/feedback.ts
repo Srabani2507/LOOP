@@ -18,8 +18,6 @@ export const CreateFeedbackSchema = z.object({
 
   externalReference: z.string().optional(),
 
-  workspaceId: z.string().cuid(),
-
   sentiment: z.nativeEnum(Sentiment).optional(),
 
   sentimentScore: z.number().min(-1).max(1).optional(),
@@ -27,14 +25,22 @@ export const CreateFeedbackSchema = z.object({
   status: z.nativeEnum(FeedbackStatus).optional(),
 });
 
-export type CreateFeedbackInput = z.infer<
-  typeof CreateFeedbackSchema
->;
+export type CreateFeedbackInput = z.infer<typeof CreateFeedbackSchema>;
 
-export const UpdateFeedbackSchema = CreateFeedbackSchema.partial().omit({
-  workspaceId: true,
+export const UpdateFeedbackSchema = CreateFeedbackSchema.partial();
+
+export type UpdateFeedbackInput = z.infer<typeof UpdateFeedbackSchema>;
+
+// Used for server-side CSV row validation
+export const CsvRowSchema = z.object({
+  content: z
+    .string()
+    .trim()
+    .min(5, "content must be at least 5 characters")
+    .max(5000),
+  channel: z.nativeEnum(FeedbackChannel),
+  customer_label: z.string().optional(),
+  created_at: z.string().optional(),
 });
 
-export type UpdateFeedbackInput = z.infer<
-  typeof UpdateFeedbackSchema
->;
+export type CsvRowInput = z.infer<typeof CsvRowSchema>;

@@ -1,0 +1,13 @@
+content,channel,customer_label,created_at
+"Onboarding is confusing — couldn't find how to set up my workspace.",WEBSITE,Sarah Johnson,2026-07-15
+"The dashboard analytics are incredibly useful. Love the sentiment breakdown!",MOBILE_APP,James Chen,2026-07-20
+"NPS survey: This tool has saved us 5 hours per week on feedback triage.",EMAIL,Emma Wilson,2026-07-22
+"API rate limit is too low for batch processing our 10k daily submissions.",API,Dev Team Alpha,2026-07-25
+"Dark mode would be a game changer. Eyes hurt after long evening sessions.",WEBSITE,Priya Kumar,2026-07-28
+"The CSV import feature doesn't handle Unicode characters well.",CSV,Ananya Gupta,2026-07-30
+"Best customer feedback tool we've tried. Switching from Productboard.",MOBILE_APP,Tom Harris,2026-08-01
+"Login keeps expiring every hour. Very disruptive to workflow.",WEBSITE,Lisa Anderson,2026-08-02
+"The theme clustering AI is surprisingly accurate for our use case.",EMAIL,Mark Thompson,2026-08-03
+"Please add Zapier integration — we need to connect this to our CRM.",API,Sarah Miller,2026-08-04
+"Mobile app is sluggish on older Android devices (Pixel 4a).",MOBILE_APP,Raj Patel,2026-08-05
+"The weekly VoC report saves me 2 hours every Monday morning.",WEBSITE,Catherine Lee,2026-08-06

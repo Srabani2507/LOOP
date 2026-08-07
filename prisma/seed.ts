@@ -86,19 +86,39 @@ async function main() {
   // 4. Create 200 Feedback items
   const channels = ["WEBSITE", "MOBILE_APP", "EMAIL", "API", "CSV"];
   const sentiments = ["POSITIVE", "NEUTRAL", "NEGATIVE"];
-  const statuses = ["NEW", "PROCESSING", "ANALYZED"];
+  const statuses = ["NEW", "NEW", "NEW", "REVIEWED", "ACTIONED", "PROCESSING", "ANALYZED"];
   
   const sampleContents = [
-    "Onboarding took forever — I couldn't figure out how to invite my team.",
-    "The new dashboard is gorgeous and finally fast. Huge improvement.",
-    "It does the job, but the mobile experience needs work.",
-    "Prospect wants SSO before they'll sign — third time this month.",
-    "Love the new export feature, saved me an hour today.",
-    "Billing page keeps timing out when I try to download an invoice.",
-    "Can you add more integrations with Slack?",
-    "The UI is a bit confusing on the settings page.",
-    "API documentation is outdated, please update it.",
-    "Great customer support, very responsive!"
+    "Onboarding took forever — I couldn't figure out how to invite my team. The documentation is outdated and confusing.",
+    "The new dashboard is gorgeous and finally fast. Huge improvement over last year's version!",
+    "It does the job, but the mobile experience needs significant work. Desktop is great though.",
+    "Prospect wants SSO before they'll sign — third time this month we've lost a deal over this.",
+    "Love the new export feature, saved me an hour today. Keep up the great work!",
+    "Billing page keeps timing out when I try to download an invoice. This has been going on for 3 weeks.",
+    "Can you add more integrations with Slack? Our team uses it daily and it would save us so much time.",
+    "The UI is a bit confusing on the settings page. Found it hard to locate the billing section.",
+    "API documentation is outdated, please update it. Several endpoints are undocumented.",
+    "Great customer support, very responsive! Solved my issue within the hour.",
+    "The search functionality is excellent. Finds exactly what I need in seconds.",
+    "Password reset emails are not arriving. Checked spam, nothing there. Tried 5 times.",
+    "The analytics dashboard is incredibly powerful. Transformed how our team makes decisions.",
+    "Two-factor authentication is broken on mobile Safari. Works fine on desktop Chrome.",
+    "Would recommend to anyone in product management. It's been a game changer.",
+    "Too expensive for what we get. Competitors offer similar features at a lower price point.",
+    "The bulk export feature crashes for datasets over 5,000 rows. Our team relies on this daily.",
+    "Just migrated from a competitor and the import was flawless. Data came over perfectly.",
+    "The new collaboration features make async work so much better for our distributed team.",
+    "App crashes on startup after the latest update. Had to roll back to previous version.",
+    "The trend analysis feature alone is worth the subscription price. Excellent product.",
+    "Integration with our CRM was seamless. Data flows automatically without manual exports.",
+    "Customer support is outstanding. Any issue gets resolved same day.",
+    "The offline mode works seamlessly. Can review reports even without internet.",
+    "Need HIPAA compliance certification before we can use this in our healthcare workflows.",
+    "Webhook deliveries are unreliable — we're missing roughly 15% of events in production.",
+    "The API rate limits are too restrictive for our use case. We need at least 10x the current limit.",
+    "Beautiful UI but it eats through battery. My phone gets hot after 20 minutes of use.",
+    "Feature request: please add the ability to tag without leaving the current view.",
+    "Found a bug: date range filter is ignored when exporting. All data gets exported regardless of filter."
   ];
 
   const realCustomerNames = [
@@ -121,9 +141,9 @@ async function main() {
     const channel = channels[Math.floor(Math.random() * channels.length)];
     const status = statuses[Math.floor(Math.random() * statuses.length)];
     
-    // Distribute createdAt randomly over the last 30 days
+    // Distribute createdAt randomly over the last 180 days (6 months) for dashboard charts
     const pastDate = new Date();
-    pastDate.setDate(pastDate.getDate() - Math.floor(Math.random() * 30));
+    pastDate.setDate(pastDate.getDate() - Math.floor(Math.random() * 180));
     
     const feedback = await prisma.feedback.create({
       data: {
