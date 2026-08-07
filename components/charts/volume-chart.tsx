@@ -1,15 +1,24 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { chartData } from '@/lib/mock-data'
 import { Card } from '@/components/ui/card'
 
-export function VolumeChart() {
+interface VolumeChartProps {
+  data?: Array<{
+    month: string
+    volume: number
+    positive?: number
+    negative?: number
+    neutral?: number
+  }>
+}
+
+export function VolumeChart({ data = [] }: VolumeChartProps) {
   return (
     <Card className="p-6">
       <h3 className="mb-4 font-semibold">Feedback Volume</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={chartData}>
+        <BarChart data={data}>
           <defs>
             <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#1a2a6c" />
@@ -33,4 +42,5 @@ export function VolumeChart() {
     </Card>
   )
 }
+
 

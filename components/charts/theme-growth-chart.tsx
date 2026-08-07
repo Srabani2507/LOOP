@@ -1,12 +1,21 @@
 'use client'
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { chartData } from '@/lib/mock-data'
 
-export function ThemeGrowthChart() {
+interface ThemeGrowthChartProps {
+  data?: Array<{
+    month: string
+    volume?: number
+    positive?: number
+    negative?: number
+    neutral?: number
+  }>
+}
+
+export function ThemeGrowthChart({ data = [] }: ThemeGrowthChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData}>
+      <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
         <XAxis dataKey="month" stroke="var(--muted-foreground)" />
         <YAxis stroke="var(--muted-foreground)" />
@@ -24,3 +33,4 @@ export function ThemeGrowthChart() {
     </ResponsiveContainer>
   )
 }
+

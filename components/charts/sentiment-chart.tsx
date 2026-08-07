@@ -1,19 +1,26 @@
 'use client'
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
-import { sentimentData } from '@/lib/mock-data'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { Card } from '@/components/ui/card'
 
 const COLORS = ['var(--chart-2)', 'var(--chart-4)', 'var(--chart-3)']
 
-export function SentimentChart() {
+interface SentimentChartProps {
+  data?: Array<{
+    name: string
+    value: number
+    color?: string
+  }>
+}
+
+export function SentimentChart({ data = [] }: SentimentChartProps) {
   return (
     <Card className="p-6">
       <h3 className="mb-4 font-semibold">Sentiment Breakdown</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={sentimentData}
+            data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
@@ -22,7 +29,7 @@ export function SentimentChart() {
             fill="#8884d8"
             dataKey="value"
           >
-            {sentimentData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
@@ -38,4 +45,5 @@ export function SentimentChart() {
     </Card>
   )
 }
+
 
