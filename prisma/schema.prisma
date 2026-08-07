@@ -68,9 +68,6 @@
     NEW
     REVIEWED
     ACTIONED
-    PROCESSING
-    ANALYZED
-    FAILED
   }
 
   model Feedback {

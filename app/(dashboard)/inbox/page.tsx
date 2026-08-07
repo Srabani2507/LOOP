@@ -40,7 +40,7 @@ interface FeedbackItem {
   externalReference: string | null;
   sentiment: "POSITIVE" | "NEUTRAL" | "NEGATIVE" | null;
   sentimentScore: number | null;
-  status: "NEW" | "REVIEWED" | "ACTIONED" | "PROCESSING" | "ANALYZED" | "FAILED";
+  status: "NEW" | "REVIEWED" | "ACTIONED";
   createdAt: string;
   themes: Array<{ confidence: number | null; theme: ThemeRef }>;
   workspace: { id: string; name: string };
@@ -66,9 +66,6 @@ const statusStyles: Record<string, string> = {
   NEW: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
   REVIEWED: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
   ACTIONED: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  PROCESSING: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 animate-pulse",
-  ANALYZED: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
-  FAILED: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
 };
 
 const channelStyles: Record<string, string> = {
@@ -529,9 +526,6 @@ export default function InboxPage() {
                 <option value="NEW">New</option>
                 <option value="REVIEWED">Reviewed</option>
                 <option value="ACTIONED">Actioned</option>
-                <option value="PROCESSING">Processing (AI)</option>
-                <option value="ANALYZED">Analyzed (AI)</option>
-                <option value="FAILED">Failed (AI)</option>
               </select>
             </div>
 

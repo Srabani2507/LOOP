@@ -86,7 +86,7 @@ async function main() {
   // 4. Create 200 Feedback items
   const channels = ["WEBSITE", "MOBILE_APP", "EMAIL", "API", "CSV"];
   const sentiments = ["POSITIVE", "NEUTRAL", "NEGATIVE"];
-  const statuses = ["NEW", "NEW", "NEW", "REVIEWED", "ACTIONED", "PROCESSING", "ANALYZED"];
+  const statuses = ["NEW", "NEW", "NEW", "REVIEWED", "ACTIONED"];
   
   const sampleContents = [
     "Onboarding took forever — I couldn't figure out how to invite my team. The documentation is outdated and confusing.",
