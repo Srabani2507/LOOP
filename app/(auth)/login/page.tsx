@@ -32,12 +32,22 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [redirectUrl, setRedirectUrl] = useState("/dashboard");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const isDark = document.documentElement.classList.contains("dark");
     setTheme(isDark ? "dark" : "light");
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cb = params.get("callbackUrl");
+      if (cb) {
+        setRedirectUrl(cb);
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    }
   }, []);
 
   const toggleTheme = () => {
@@ -70,7 +80,7 @@ export default function LoginPage() {
         setError("Invalid email or password. Please try again.");
         setLoading(false);
       } else {
-        router.push("/dashboard");
+        router.push(redirectUrl);
         router.refresh();
       }
     } catch (err) {

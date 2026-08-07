@@ -101,6 +101,19 @@ async function main() {
     "Great customer support, very responsive!"
   ];
 
+  const realCustomerNames = [
+    "Rohan Sharma", "Priya Patel", "Aarav Mehta", "Ananya Gupta", "Rajesh Kumar",
+    "Srabani Kar", "Vikram Singh", "Kavya Verma", "Aditya Roy", "Neha Kapoor",
+    "Siddharth Malhotra", "Tanvi Deshmukh", "Arjun Nair", "Deepika Iyer", "Karan Joshi",
+    "Meera Sen", "Amitabh Reddy", "Pooja Agarwal", "Rahul Mukherjee", "Sneha Rao",
+    "Ishaan Choudhury", "Diya Banerjee", "Devendra Mishra", "Ritu Bhattacharya", "Manish Saxena",
+    "Shreya Ghoshal", "Varun Kulkarni", "Aditi Das", "Pranav Hegde", "Kriti Sanon",
+    "Harsh Vardhan", "Rhea Pillai", "Gaurav Tripathi", "Swati Pillai", "Aakash Dutta",
+    "Nisha Rastogi", "Vivek Menon", "Bhavya Trivedi", "Sandeep Chaudhari", "Anushka Shetty",
+    "Rishi Kapoor", "Nandini Ranganathan", "Alok Pandey", "Sunita Krishnan", "Sameer Bansal",
+    "Preeti Singhania", "Tushar Deshpande", "Payal Shah", "Manoj Nambiar", "Divya Gautam"
+  ];
+
   const feedbacks = [];
   for (let i = 0; i < 200; i++) {
     const sentiment = sentiments[Math.floor(Math.random() * sentiments.length)];
@@ -114,12 +127,12 @@ async function main() {
     
     const feedback = await prisma.feedback.create({
       data: {
-        content: `${contentTemplate} [ID: ${i}]`,
+        content: contentTemplate,
         channel: channel as any,
         sentiment: sentiment as any,
         sentimentScore: sentiment === "POSITIVE" ? 0.8 : (sentiment === "NEGATIVE" ? -0.8 : 0),
         status: status as any,
-        customerLabel: `Customer ${Math.floor(Math.random() * 50) + 1}`,
+        customerLabel: realCustomerNames[Math.floor(Math.random() * realCustomerNames.length)],
         externalReference: `REF-${Math.floor(Math.random() * 10000)}`,
         workspaceId: workspace.id,
         createdAt: pastDate,
