@@ -1,3 +1,9 @@
+/**
+ * GET /api/trends
+ * Returns theme volume data with REAL period-over-period spike detection.
+ * Compares the last 7 days vs the prior 7 days for each theme.
+ */
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/rbac";
@@ -8,41 +14,80 @@ export async function GET() {
     if ("response" in authResult) return authResult.response;
     const { workspaceId } = authResult.auth;
 
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(now.getDate() - 14);
+
+    // All themes in workspace
     const themes = await prisma.theme.findMany({
       where: { workspaceId },
-      include: {
-        _count: {
-          select: { feedbacks: true },
-        },
-      },
-      orderBy: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        color: true,
         feedbacks: {
-          _count: "desc",
+          select: {
+            feedbackId: true,
+            feedback: {
+              select: { createdAt: true },
+            },
+          },
         },
       },
     });
 
-    const totalFeedbackCount = await prisma.feedback.count({ where: { workspaceId } });
+    const themesData = themes
+      .map((theme) => {
+        const allLinks = theme.feedbacks;
+        const totalCount = allLinks.length;
 
-    const themesData = themes.map((t, idx) => {
-      // Calculate growth trend percentage based on volume & position
-      const count = t._count.feedbacks;
-      const trend = Math.round((count / (totalFeedbackCount || 1)) * 100);
-      return {
-        id: t.id,
-        theme: t.name,
-        count,
-        trend: idx % 2 === 0 ? trend : -Math.abs(trend),
-        description: t.description || `Feedback related to ${t.name}`,
-      };
-    });
+        // Current period: last 7 days
+        const currentPeriodCount = allLinks.filter(
+          (link) => link.feedback.createdAt >= sevenDaysAgo
+        ).length;
 
-    // Detect top spike alerts
-    const spikeAlerts = themesData.slice(0, 3).map((t) => ({
-      theme: t.theme,
-      change: `+${Math.max(t.trend, 10)}%`,
-      description: `Increased feedback volume observed for ${t.theme}`,
-    }));
+        // Previous period: 7–14 days ago
+        const previousPeriodCount = allLinks.filter(
+          (link) =>
+            link.feedback.createdAt >= fourteenDaysAgo &&
+            link.feedback.createdAt < sevenDaysAgo
+        ).length;
+
+        // Spike: % change from previous → current period
+        const trendPercent =
+          previousPeriodCount === 0
+            ? currentPeriodCount > 0
+              ? 100
+              : 0
+            : Math.round(
+                ((currentPeriodCount - previousPeriodCount) / previousPeriodCount) * 100
+              );
+
+        return {
+          id: theme.id,
+          theme: theme.name,
+          color: theme.color,
+          count: totalCount,
+          currentPeriodCount,
+          previousPeriodCount,
+          trend: trendPercent,
+          description: theme.description || `Feedback related to ${theme.name}`,
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+
+    // Spike alerts: themes with >20% growth week-over-week (real data)
+    const spikeAlerts = themesData
+      .filter((t) => t.trend >= 20 && t.currentPeriodCount > 0)
+      .slice(0, 5)
+      .map((t) => ({
+        theme: t.theme,
+        change: `+${t.trend}%`,
+        description: `${t.currentPeriodCount} mentions in the last 7 days vs ${t.previousPeriodCount} in the prior week — up ${t.trend}% week-over-week.`,
+      }));
 
     return NextResponse.json({
       themesData,

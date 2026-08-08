@@ -8,6 +8,68 @@ import {
 import { prisma } from "@/lib/db";
 import { CreateFeedbackSchema } from "@/lib/validators/feedback";
 import { requireAuth } from "@/lib/rbac";
+import { classifyFeedback } from "@/lib/ai";
+
+// ─── Helper: deterministic color per theme name ───────────────────────────────
+function generateThemeColor(name: string): string {
+  const colors = [
+    "#6366f1", "#8b5cf6", "#ec4899", "#f43f5e", "#f97316",
+    "#eab308", "#22c55e", "#14b8a6", "#06b6d4", "#3b82f6",
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+// ─── Background AI classification (fire-and-forget) ──────────────────────────
+async function triggerClassification(feedbackId: string, content: string, workspaceId: string) {
+  try {
+    const existingThemes = await prisma.theme.findMany({
+      where: { workspaceId },
+      select: { id: true, name: true },
+    });
+    const themeNames = existingThemes.map((t) => t.name);
+
+    const classification = await classifyFeedback(content, themeNames);
+    if (!classification) return;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.feedbackTheme.deleteMany({ where: { feedbackId } });
+
+      await tx.feedback.update({
+        where: { id: feedbackId },
+        data: {
+          sentiment: classification.sentiment as Sentiment,
+          sentimentScore: classification.sentimentScore,
+        },
+      });
+
+      for (const themeName of classification.themes) {
+        if (!themeName?.trim()) continue;
+        const theme = await tx.theme.upsert({
+          where: { workspaceId_name: { workspaceId, name: themeName.trim() } },
+          create: {
+            name: themeName.trim(),
+            description: `Auto-created by LOOP AI`,
+            color: generateThemeColor(themeName),
+            workspaceId,
+          },
+          update: {},
+          select: { id: true },
+        });
+        await tx.feedbackTheme.create({
+          data: {
+            feedbackId,
+            themeId: theme.id,
+            confidence: Math.max(0, Math.min(1, (classification.sentimentScore + 1) / 2)),
+          },
+        });
+      }
+    });
+  } catch (err) {
+    console.error("[feedback POST] Background classification error:", err);
+  }
+}
 
 // =========================
 // GET /api/feedback
@@ -191,6 +253,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Fire-and-forget: classify in the background, don't block the response
+    triggerClassification(feedback.id, feedback.content, workspaceId).catch(() => {});
 
     return NextResponse.json(feedback, { status: 201 });
   } catch (error) {

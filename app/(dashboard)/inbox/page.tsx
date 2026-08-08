@@ -19,6 +19,7 @@ import {
   Zap,
   Calendar,
   Tag,
+  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -159,6 +160,9 @@ export default function InboxPage() {
   // ── Inline status change
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
+  // ── Re-classify
+  const [reclassifyingId, setReclassifyingId] = useState<string | null>(null);
+
   // ─────────────────────────────────────────────────────────────────────────
   // Fetch themes (for filter dropdown)
   // ─────────────────────────────────────────────────────────────────────────
@@ -295,6 +299,40 @@ export default function InboxPage() {
       setError(err.message || "Failed to delete feedback");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Re-classify with AI
+  // ─────────────────────────────────────────────────────────────────────────
+  const handleReclassify = async (id: string) => {
+    setReclassifyingId(id);
+    try {
+      const res = await fetch(`/api/feedback/${id}/classify`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Classification failed");
+      // Update the item's sentiment and themes in-place
+      setFeedbacks((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                sentiment: data.sentiment ?? item.sentiment,
+                sentimentScore: data.sentimentScore ?? item.sentimentScore,
+                themes: data.themes ?? item.themes,
+              }
+            : item
+        )
+      );
+      setSuccessMessage("✓ AI re-classification complete.");
+      setTimeout(() => setSuccessMessage(""), 4000);
+      // Refresh to get linked theme objects
+      fetchFeedback();
+    } catch (err: any) {
+      setError(err.message || "Failed to re-classify feedback");
+      setTimeout(() => setError(""), 4000);
+    } finally {
+      setReclassifyingId(null);
     }
   };
 
@@ -764,13 +802,28 @@ export default function InboxPage() {
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {canEdit && (
-                            <button
-                              onClick={() => openEditModal(item)}
-                              title="Edit"
-                              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </button>
+                            <>
+                              {/* Re-classify with AI */}
+                              <button
+                                onClick={() => handleReclassify(item.id)}
+                                disabled={reclassifyingId === item.id}
+                                title="Re-classify with AI"
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
+                              >
+                                {reclassifyingId === item.id ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <Sparkles className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => openEditModal(item)}
+                                title="Edit"
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                            </>
                           )}
                           {canDelete && (
                             <button

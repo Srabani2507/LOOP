@@ -32,15 +32,17 @@ async function main() {
 
   // 2. Create 5 Users
   const roles = ["ADMIN", "ANALYST", "ANALYST", "VIEWER", "VIEWER"];
+  const userNames = ["Srabani Kar", "Rup Sarkar", "Priya Patel", "Vikram Singh", "Neha Kapoor"];
+  const userEmails = ["srabanikar05@gmail.com", "rupsarkar@gmail.com", "priyapatel@gmail.com", "vikramsingh@gmail.com", "nehakapoor@gmail.com"];
   const users = [];
   const hashedPassword = await bcrypt.hash("password123", 10);
   for (let i = 0; i < 5; i++) {
     const user = await prisma.user.upsert({
-      where: { email: `user${i + 1}@demo.com` },
-      update: {},
+      where: { email: userEmails[i] },
+      update: { name: userNames[i], email: userEmails[i] },
       create: {
-        name: `User ${i + 1}`,
-        email: `user${i + 1}@demo.com`,
+        name: userNames[i],
+        email: userEmails[i],
         passwordHash: hashedPassword,
         role: roles[i] as any,
         workspaceId: workspace.id,

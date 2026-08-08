@@ -1,65 +1,120 @@
 'use client';
 
-import { useState } from 'react';
-import { Send, Loader, Lightbulb, Bot } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Loader, Lightbulb, Bot, ExternalLink, CheckCircle2, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface SourceItem {
+  id: string;
+  content: string;
+  channel: string;
+  sentiment: string | null;
+  sentimentScore?: number | null;
+  createdAt?: string;
+  cited: boolean;
+}
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  sources?: SourceItem[];
+  retrievedCount?: number;
+  error?: boolean;
 }
 
-const DEFAULT_SUGGESTED_QUESTIONS = [
+// ─── Style maps ───────────────────────────────────────────────────────────────
+
+const sentimentStyles: Record<string, string> = {
+  POSITIVE: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  NEGATIVE: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  NEUTRAL: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20',
+};
+
+const channelLabel: Record<string, string> = {
+  WEBSITE: 'Website',
+  MOBILE_APP: 'Mobile App',
+  EMAIL: 'Email',
+  API: 'API',
+  CSV: 'CSV',
+};
+
+const DEFAULT_QUESTIONS = [
   'What are customers saying about onboarding & signup?',
-  'Which features are most requested in user feedback?',
+  'Which features are most requested by users?',
   'How has customer sentiment changed recently?',
-  'What are the top complaint areas reported this week?',
+  'What are the top complaint areas this week?',
+  'What do customers love most about the product?',
 ];
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AskPage() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-scroll to the latest message
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSend = async (questionText?: string) => {
-    const query = questionText || message;
-    if (!query.trim() || isLoading) return;
+    const query = (questionText ?? message).trim();
+    if (!query || isLoading) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: query.trim(),
+      content: query,
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    if (!questionText) setMessage('');
+    setMessage('');
     setIsLoading(true);
 
     try {
-      // Send query to AI / Search API handler or fallback gracefully to grounded database query context
-      const res = await fetch('/api/feedback?limit=5');
-      let botResponse = `Based on current feedback records in your database, here is what we found regarding "${query.trim()}": Most users highlighted app speed, interface simplicity, and customer support response times.`;
-      
-      if (res.ok) {
-        const data = await res.json();
-        if (data.data && data.data.length > 0) {
-          const sample = data.data.map((f: any) => `"${f.content}"`).slice(0, 3).join(', ');
-          botResponse = `Grounding against ${data.total} feedback entries in your workspace. Top matching feedback includes: ${sample}.`;
-        }
+      const res = await fetch('/api/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: query }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to get AI answer');
       }
+
+      const data = await res.json();
 
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: botResponse,
+        content: data.answer,
+        sources: [
+          ...(data.sources || []),
+          ...(data.related || []),
+        ],
+        retrievedCount: data.retrievedCount,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err) {
-      console.error('Error fetching Ask response:', err);
+    } catch (err: any) {
+      const errMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: err.message || 'Something went wrong. Please try again.',
+        error: true,
+      };
+      setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsLoading(false);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
@@ -67,85 +122,140 @@ export default function AskPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Ask LOOP</h1>
-        <p className="mt-1 text-muted-foreground">Ask our AI assistant about your customer feedback</p>
+        <p className="mt-1 text-muted-foreground">
+          Ask plain-English questions — answers are grounded in your real customer feedback
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 flex flex-col h-[600px]">
-          <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-border bg-card p-6 mb-4">
+        {/* ── Chat panel ── */}
+        <div className="lg:col-span-2 flex flex-col h-[650px]">
+          {/* Message list */}
+          <div className="flex-1 overflow-y-auto rounded-2xl border border-border bg-card p-5 mb-4 space-y-5">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-3">
-                  <Bot className="h-6 w-6" />
+              <div className="flex flex-col items-center justify-center h-full text-center select-none">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-inner">
+                  <Bot className="h-7 w-7" />
                 </div>
-                <h3 className="font-semibold text-foreground">Ask anything about your feedback</h3>
-                <p className="text-xs text-muted-foreground max-w-sm mt-1">
-                  Answers are dynamically retrieved and grounded against real customer feedback stored in your database workspace.
+                <h3 className="font-semibold text-foreground text-lg">Ask anything about your feedback</h3>
+                <p className="text-xs text-muted-foreground max-w-sm mt-2 leading-relaxed">
+                  LOOP AI searches your workspace's actual customer feedback and answers only from what it finds — no hallucinations.
                 </p>
               </div>
             ) : (
               messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
+                <div key={msg.id} className={`flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                  {/* Bubble */}
                   <div
-                    className={`max-w-md rounded-2xl px-4 py-3 text-sm ${
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                       msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground font-medium shadow-sm'
-                        : 'bg-muted/80 border border-border/60 text-foreground'
+                        ? 'bg-primary text-primary-foreground font-medium'
+                        : msg.error
+                        ? 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400'
+                        : 'bg-muted/60 border border-border/60 text-foreground'
                     }`}
                   >
                     {msg.content}
                   </div>
+
+                  {/* Source citations (assistant messages only) */}
+                  {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                    <div className="max-w-[90%] w-full space-y-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-primary" />
+                        Grounded in {msg.retrievedCount} feedback item{msg.retrievedCount !== 1 ? 's' : ''} — {msg.sources.filter(s => s.cited).length} cited
+                      </p>
+                      <div className="space-y-1.5">
+                        {msg.sources.slice(0, 6).map((src) => (
+                          <div
+                            key={src.id}
+                            className={`rounded-xl border p-3 text-xs ${
+                              src.cited
+                                ? 'border-primary/30 bg-primary/5'
+                                : 'border-border/50 bg-muted/30'
+                            }`}
+                          >
+                            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                              {src.cited && (
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-primary uppercase tracking-wide">
+                                  <CheckCircle2 className="h-2.5 w-2.5" />
+                                  Cited
+                                </span>
+                              )}
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] px-1.5 py-0 h-4 ${src.sentiment ? sentimentStyles[src.sentiment] : 'bg-muted'}`}
+                              >
+                                {src.sentiment ?? '—'}
+                              </Badge>
+                              <span className="text-muted-foreground text-[10px]">
+                                {channelLabel[src.channel] ?? src.channel}
+                              </span>
+                              <span className="text-muted-foreground/60 text-[10px] ml-auto font-mono">
+                                <Hash className="inline h-2.5 w-2.5" />{src.id.slice(-6)}
+                              </span>
+                            </div>
+                            <p className="text-foreground/80 line-clamp-2 leading-relaxed">
+                              &ldquo;{src.content}&rdquo;
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
+
+            {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 rounded-2xl bg-muted/60 border border-border/60 px-4 py-2.5 text-xs text-muted-foreground">
                   <Loader className="h-3.5 w-3.5 animate-spin text-primary" />
-                  <span>Searching workspace database feedback...</span>
+                  <span>Searching feedback & generating grounded answer…</span>
                 </div>
               </div>
             )}
+
+            <div ref={bottomRef} />
           </div>
 
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Type your question..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
-                disabled={isLoading}
-                className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-              />
-              <Button
-                onClick={() => handleSend()}
-                disabled={!message.trim() || isLoading}
-                className="gap-2 rounded-xl px-5"
-              >
-                {isLoading ? (
-                  <Loader className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+          {/* Input */}
+          <div className="flex gap-3">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Ask anything about your customer feedback…"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
+              disabled={isLoading}
+              className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all"
+            />
+            <Button
+              onClick={() => handleSend()}
+              disabled={!message.trim() || isLoading}
+              className="gap-2 rounded-xl px-5"
+            >
+              {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* ── Sidebar ── */}
+        <div className="space-y-5">
+          {/* Suggested questions */}
           <div>
-            <h2 className="text-lg font-semibold mb-3">Suggested Questions</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+              Suggested Questions
+            </h2>
             <div className="space-y-2">
-              {DEFAULT_SUGGESTED_QUESTIONS.map((q, idx) => (
+              {DEFAULT_QUESTIONS.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(q)}
-                  className="w-full text-left rounded-xl border border-border/70 bg-card p-3.5 text-xs font-medium hover:bg-muted/50 hover:border-primary/40 transition-all"
+                  disabled={isLoading}
+                  className="w-full text-left rounded-xl border border-border/70 bg-card p-3.5 text-xs font-medium hover:bg-muted/50 hover:border-primary/40 transition-all disabled:opacity-50"
                 >
                   {q}
                 </button>
@@ -153,17 +263,37 @@ export default function AskPage() {
             </div>
           </div>
 
+          {/* How it works */}
           <div className="rounded-xl border border-border bg-muted/40 p-4">
-            <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+            <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
               <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-              <span>Database Query Tips</span>
+              How Ask LOOP Works
             </h3>
-            <ul className="text-xs text-muted-foreground space-y-1.5 leading-relaxed">
-              <li>• Ask about specific feature areas or channels</li>
-              <li>• Query sentiment breakdowns by date range</li>
-              <li>• Identify top recurring customer issues</li>
-              <li>• Ground AI responses directly in actual feedback rows</li>
-            </ul>
+            <ol className="text-xs text-muted-foreground space-y-2 leading-relaxed list-none">
+              <li className="flex gap-2">
+                <span className="text-primary font-bold flex-shrink-0">1.</span>
+                Your question is matched against your workspace's feedback using keyword retrieval
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold flex-shrink-0">2.</span>
+                The top matching items are passed to the AI as grounding context
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold flex-shrink-0">3.</span>
+                The AI answers <strong>only</strong> from that context — no hallucinations
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold flex-shrink-0">4.</span>
+                Cited sources are shown so you can verify every claim
+              </li>
+            </ol>
+          </div>
+
+          {/* Powered by */}
+          <div className="rounded-xl border border-border/50 bg-card/50 p-3 text-center">
+            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest">Powered by</p>
+            <p className="text-xs font-semibold text-foreground mt-0.5">Groq · GPT OSS 120B</p>
+            <p className="text-[10px] text-muted-foreground/60 mt-0.5">Answers grounded in your data</p>
           </div>
         </div>
       </div>
