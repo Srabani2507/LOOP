@@ -110,7 +110,7 @@ function InactiveItem({ item, onClick }: { item: NavItem; onClick?: () => void }
       <Link
         href={item.href}
         onClick={onClick}
-        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+        className="flex items-center gap-3 px-4 py-4 md:py-5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
       >
         <motion.div
           className="shrink-0 h-5 w-5"
@@ -135,7 +135,7 @@ function ActiveItem({ item }: { item: NavItem }) {
   return (
     <motion.div
       key={`active-${item.href}`}
-      className="flex items-center gap-3 px-4 py-3"
+      className="flex items-center gap-3 px-4 py-4 md:py-5"
       variants={waterWaveVariants}
       initial="initial"
       animate="animate"
@@ -143,7 +143,7 @@ function ActiveItem({ item }: { item: NavItem }) {
     >
       <motion.div
         layoutId="active-icon"
-        className="rounded-full bg-primary/90 flex items-center justify-center shadow-xl shadow-primary/50 h-10 w-10 shrink-0"
+        className="rounded-full bg-primary/90 flex items-center justify-center shadow-xl shadow-primary/50 h-11 w-11 shrink-0"
         variants={iconWaveVariants}
         initial="initial"
         animate="animate"
@@ -154,7 +154,7 @@ function ActiveItem({ item }: { item: NavItem }) {
 
       <motion.div
         layoutId="active-pill"
-        className="flex-1 bg-gradient-to-r from-primary/25 to-primary/10 backdrop-blur-md border border-primary/40 rounded-full flex items-center shadow-sm shadow-primary/20 h-10 px-4"
+        className="flex-1 bg-gradient-to-r from-primary/25 to-primary/10 backdrop-blur-md border border-primary/40 rounded-full flex items-center shadow-sm shadow-primary/20 h-11 px-4"
         variants={pillWaveVariants}
         initial="initial"
         animate="animate"
@@ -327,13 +327,13 @@ export function Sidebar() {
                 <Link
                   href="/settings"
                   onClick={handleNavClick}
-                  className="flex items-center justify-center h-8 rounded-xl text-sm font-normal bg-blue-500/25 text-blue-700 dark:text-blue-400 hover:bg-blue-400/40 transition-colors shadow-sm"
+                  className="flex items-center justify-center h-8 rounded-xl text-sm font-normal bg-primary/10 text-primary/90 hover:bg-primary/20 hover:text-primary transition-colors shadow-sm"
                 >
                   Profile
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center justify-center gap-1.5 h-8 rounded-xl text-sm font-normal bg-destructive/20 text-destructive hover:bg-destructive/35 transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 h-8 rounded-xl text-sm font-normal bg-destructive/10 text-destructive/90 hover:bg-destructive/20 hover:text-destructive transition-colors cursor-pointer"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   Sign Out
