@@ -77,11 +77,11 @@ export async function GET() {
     ]);
 
     const sentimentData = [
-      { name: "Positive", value: positive, color: "#10b981" },
-      { name: "Neutral", value: neutral, color: "#f59e0b" },
-      { name: "Negative", value: negative, color: "#ef4444" },
+      { name: "Positive", value: positive, color: "#905690" },   // muted warm mauve   — HSL(300°,25%,45%) warm end
+      { name: "Neutral",  value: neutral,  color: "#6a5a87" },   // muted purple-gray  — HSL(262°,20%,44%) mid
+      { name: "Negative", value: negative, color: "#445a79" },   // muted steel-blue   — HSL(215°,28%,37%) cool end
       ...(unclassified > 0
-        ? [{ name: "Unclassified", value: unclassified, color: "#94a3b8" }]
+        ? [{ name: "Unclassified", value: unclassified, color: "#7e8ba5" }]  // cool blue-gray
         : []),
     ].filter((d) => d.value > 0);
 
@@ -99,10 +99,16 @@ export async function GET() {
       },
     });
 
-    const topThemesChart = topThemes.map((t) => ({
+    // Distinct muted spectrum with clear lightness steps for better contrast
+    const BRAND_THEME_COLORS = [
+      '#4a306d', '#6b4c8a', '#8b6d9e', '#a37fa3', // Deep to soft purples/mauves
+      '#38466b', '#50628a', '#6d7fa3', '#8496ab', // Deep to soft indigos/blue-grays
+    ]
+
+    const topThemesChart = topThemes.map((t, index) => ({
       name: t.name,
       count: t._count.feedbacks,
-      color: t.color || "#6366f1",
+      color: BRAND_THEME_COLORS[index % BRAND_THEME_COLORS.length],
     }));
 
     return NextResponse.json({

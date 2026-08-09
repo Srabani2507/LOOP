@@ -18,7 +18,8 @@ interface SentimentChartProps {
   }>
 }
 
-const FALLBACK_COLORS = ['#10b981', '#f59e0b', '#ef4444', '#94a3b8']
+// Three distinct hue zones (85° apart) at ~22-25% saturation — warm/mid/cool
+const FALLBACK_COLORS = ['#905690', '#6a5a87', '#445a79', '#7e8ba5']
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null

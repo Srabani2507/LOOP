@@ -59,17 +59,20 @@ export function VolumeChart({ data = [] }: VolumeChartProps) {
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={data} barGap={2}>
             <defs>
+              {/* Positive — muted warm mauve HSL(300°,25%,45%) */}
               <linearGradient id="posGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="#905690" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#905690" stopOpacity={0.55} />
               </linearGradient>
+              {/* Negative — muted steel-blue HSL(215°,28%,37%) */}
               <linearGradient id="negGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#ef4444" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="#445a79" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#445a79" stopOpacity={0.55} />
               </linearGradient>
+              {/* Neutral — muted purple-gray HSL(262°,20%,44%) */}
               <linearGradient id="neuGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="#6a5a87" stopOpacity={0.95} />
+                <stop offset="100%" stopColor="#6a5a87" stopOpacity={0.55} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />

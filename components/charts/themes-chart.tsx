@@ -32,9 +32,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
+// Distinct muted spectrum with clear lightness steps for better contrast
 const THEME_COLORS = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b',
-  '#10b981', '#06b6d4', '#f97316', '#84cc16',
+  '#4a306d', '#6b4c8a', '#8b6d9e', '#a37fa3', // Deep to soft purples/mauves
+  '#38466b', '#50628a', '#6d7fa3', '#8496ab', // Deep to soft indigos/blue-grays
 ]
 
 export function ThemesChart({ data = [] }: ThemesChartProps) {
