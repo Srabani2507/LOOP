@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Download, Eye, Loader2, FileText, X, Sparkles, TrendingUp, BarChart2 } from 'lucide-react';
+import { Download, Eye, Loader2, FileText, X, Sparkles, TrendingUp, BarChart2, Share2, CheckCircle2, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -35,11 +36,13 @@ interface ReportItem {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ReportsPage() {
+  const router = useRouter();
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [viewingReport, setViewingReport] = useState<ReportItem | null>(null);
   const [error, setError] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   async function fetchReports() {
     try {
@@ -76,6 +79,18 @@ export default function ReportsPage() {
       setTimeout(() => setError(''), 6000);
     } finally {
       setGenerating(false);
+    }
+  }
+
+  async function handleShare(report: ReportItem) {
+    const url = `${window.location.origin}/reports/${report.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(report.id);
+      setTimeout(() => setCopiedId(null), 2500);
+    } catch {
+      // fallback for browsers without clipboard API
+      window.prompt('Copy this link:', url);
     }
   }
 
@@ -237,24 +252,49 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Footer actions */}
-                <div className="flex gap-2 px-5 pb-5">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 gap-2 rounded-xl"
-                    onClick={() => handleDownload(report)}
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Download
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="flex-1 gap-2 rounded-xl"
-                    onClick={() => setViewingReport(report)}
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                    View
-                  </Button>
+                <div className="flex flex-col gap-2 px-5 pb-5">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2 rounded-xl"
+                      onClick={() => handleDownload(report)}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2 rounded-xl"
+                      onClick={() => handleShare(report)}
+                    >
+                      {copiedId === report.id ? (
+                        <><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />Copied!</>
+                      ) : (
+                        <><Share2 className="h-3.5 w-3.5" />Share</>
+                      )}
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex-1 gap-2 rounded-xl"
+                      onClick={() => setViewingReport(report)}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      Quick View
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1 gap-2 rounded-xl"
+                      onClick={() => router.push(`/reports/${report.id}`)}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Full Report
+                    </Button>
+                  </div>
                 </div>
               </div>
             );
