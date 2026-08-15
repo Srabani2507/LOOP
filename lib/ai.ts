@@ -9,7 +9,7 @@ import { z } from "zod";
 
 // ─── Groq client ─────────────────────────────────────────────────────────────
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY!,
+  apiKey: process.env.GROQ_API_KEY || "missing_api_key",
 });
 
 // Use Groq's GPT OSS 120B
