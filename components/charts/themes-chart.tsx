@@ -42,52 +42,55 @@ export function ThemesChart({ data = [] }: ThemesChartProps) {
   const isEmpty = !data.length || data.every((d) => d.count === 0)
 
   return (
-    <Card className="p-6">
-      <div className="mb-4">
-        <h3 className="font-semibold text-base">Top Themes</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Most discussed topics by feedback volume</p>
-      </div>
-
-      {isEmpty ? (
-        <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-          <div className="text-center">
-            <p className="font-medium">No themes yet</p>
-            <p className="text-xs mt-1">Run theme clustering to populate this chart</p>
-          </div>
+    <Card className="relative p-6 overflow-hidden">
+      <div className="absolute inset-0 bg-primary-gradient opacity-[0.12] dark:opacity-[0.16] pointer-events-none" />
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="mb-4">
+          <h3 className="font-semibold text-base">Top Themes</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Most discussed topics by feedback volume</p>
         </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={data} layout="vertical" margin={{ left: 8, right: 24 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} horizontal={false} />
-            <XAxis
-              type="number"
-              stroke="currentColor"
-              strokeOpacity={0.4}
-              tick={{ fontSize: 12 }}
-              allowDecimals={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              stroke="currentColor"
-              strokeOpacity={0.4}
-              tick={{ fontSize: 12 }}
-              width={110}
-              tickFormatter={(v: string) => v.length > 14 ? v.slice(0, 13) + '…' : v}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" radius={[0, 4, 4, 0]} name="count">
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color ?? THEME_COLORS[index % THEME_COLORS.length]}
-                  fillOpacity={0.85}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      )}
+
+        {isEmpty ? (
+          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
+            <div className="text-center">
+              <p className="font-medium">No themes yet</p>
+              <p className="text-xs mt-1">Run theme clustering to populate this chart</p>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={data} layout="vertical" margin={{ left: 8, right: 24 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.12} horizontal={false} />
+              <XAxis
+                type="number"
+                stroke="currentColor"
+                strokeOpacity={0.4}
+                tick={{ fontSize: 12 }}
+                allowDecimals={false}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                stroke="currentColor"
+                strokeOpacity={0.4}
+                tick={{ fontSize: 12 }}
+                width={110}
+                tickFormatter={(v: string) => v.length > 14 ? v.slice(0, 13) + '…' : v}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} name="count">
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color ?? THEME_COLORS[index % THEME_COLORS.length]}
+                    fillOpacity={0.85}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
     </Card>
   )
 }

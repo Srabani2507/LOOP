@@ -143,24 +143,26 @@ function ActiveItem({ item }: { item: NavItem }) {
     >
       <motion.div
         layoutId="active-icon"
-        className="rounded-full bg-primary/90 flex items-center justify-center shadow-xl shadow-primary/50 h-11 w-11 shrink-0"
+        className="rounded-full bg-primary/90 dark:bg-card dark:border dark:border-border flex items-center justify-center shadow-xl shadow-primary/50 dark:shadow-xl dark:shadow-primary/20 h-11 w-11 shrink-0 relative overflow-hidden"
         variants={iconWaveVariants}
         initial="initial"
         animate="animate"
         exit="exit"
       >
-        <item.icon className="text-primary-foreground h-5 w-5" />
+        <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+        <item.icon className="text-primary-foreground dark:text-foreground h-5 w-5 relative z-10" />
       </motion.div>
 
       <motion.div
         layoutId="active-pill"
-        className="flex-1 bg-gradient-to-r from-primary/25 to-primary/10 backdrop-blur-md border border-primary/40 rounded-full flex items-center shadow-sm shadow-primary/20 h-11 px-4"
+        className="flex-1 bg-gradient-to-r from-primary/25 to-primary/10 dark:bg-none dark:bg-card backdrop-blur-md border border-primary/40 dark:border-border rounded-full flex items-center shadow-sm shadow-primary/20 dark:shadow-sm h-11 px-4 relative overflow-hidden"
         variants={pillWaveVariants}
         initial="initial"
         animate="animate"
         exit="exit"
       >
-        <motion.span className="font-semibold text-primary truncate text-sm">
+        <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+        <motion.span className="font-semibold text-primary dark:text-foreground truncate text-sm relative z-10">
           {item.label}
         </motion.span>
       </motion.div>

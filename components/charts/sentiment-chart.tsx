@@ -51,7 +51,7 @@ const CustomLabel = ({ cx, cy, midAngle, outerRadius, name, value, percent }: an
       fill="currentColor"
       textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="central"
-      fontSize={11}
+      fontSize={12}
       opacity={0.8}
     >
       {`${name} (${Math.round(percent * 100)}%)`}
@@ -65,50 +65,53 @@ export function SentimentChart({ data = [] }: SentimentChartProps) {
   const enriched = data.map((d) => ({ ...d, total }))
 
   return (
-    <Card className="p-6">
-      <div className="mb-4">
-        <h3 className="font-semibold text-base">Sentiment Breakdown</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Distribution across all feedback</p>
-      </div>
-
-      {isEmpty ? (
-        <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-          <div className="text-center">
-            <p className="font-medium">No sentiment data yet</p>
-            <p className="text-xs mt-1">Run AI classification to generate sentiment data</p>
-          </div>
+    <Card className="relative p-6 overflow-hidden">
+      <div className="absolute inset-0 bg-primary-gradient opacity-[0.12] dark:opacity-[0.16] pointer-events-none" />
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="mb-4">
+          <h3 className="font-semibold text-base">Sentiment Breakdown</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Distribution across all feedback</p>
         </div>
-      ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <PieChart>
-            <Pie
-              data={enriched}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={CustomLabel}
-              outerRadius={90}
-              innerRadius={45}
-              dataKey="value"
-              paddingAngle={2}
-            >
-              {enriched.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]}
-                  stroke="transparent"
-                />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-            <Legend
-              iconType="circle"
-              iconSize={8}
-              formatter={(v) => <span className="text-xs">{v}</span>}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      )}
+
+        {isEmpty ? (
+          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
+            <div className="text-center">
+              <p className="font-medium">No sentiment data yet</p>
+              <p className="text-xs mt-1">Run AI classification to generate sentiment data</p>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={enriched}
+                cx="56%"
+                cy="50%"
+                labelLine={false}
+                label={CustomLabel}
+                outerRadius={90}
+                innerRadius={45}
+                dataKey="value"
+                paddingAngle={2}
+              >
+                {enriched.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]}
+                    stroke="transparent"
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                iconType="circle"
+                iconSize={10}
+                formatter={(v) => <span className="text-sm">{v}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
+      </div>
     </Card>
   )
 }
