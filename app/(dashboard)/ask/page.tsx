@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader, Lightbulb, Bot, ExternalLink, CheckCircle2, Hash } from 'lucide-react';
+import { Send, Loader, Lightbulb, Bot, ExternalLink, CheckCircle2, Hash, User, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -24,14 +24,15 @@ interface ChatMessage {
   sources?: SourceItem[];
   retrievedCount?: number;
   error?: boolean;
+  timestamp?: string;
 }
 
 // ─── Style maps ───────────────────────────────────────────────────────────────
 
 const sentimentStyles: Record<string, string> = {
-  POSITIVE: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-  NEGATIVE: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/20',
-  NEUTRAL: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  POSITIVE: 'bg-[#905690]/30 text-[#905690] border-[#905690]/40 dark:text-[#b573b5]',
+  NEGATIVE: 'bg-[#445a79]/30 text-[#445a79] border-[#445a79]/40 dark:text-[#6c8ab2]',
+  NEUTRAL: 'bg-[#6a5a87]/30 text-[#6a5a87] border-[#6a5a87]/40 dark:text-[#8f7dba]',
 };
 
 const channelLabel: Record<string, string> = {
@@ -68,10 +69,14 @@ export default function AskPage() {
     const query = (questionText ?? message).trim();
     if (!query || isLoading) return;
 
+    const now = new Date();
+    const timestampStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
       content: query,
+      timestamp: timestampStr,
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -101,6 +106,7 @@ export default function AskPage() {
           ...(data.related || []),
         ],
         retrievedCount: data.retrievedCount,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
@@ -110,6 +116,7 @@ export default function AskPage() {
         role: 'assistant',
         content: err.message || 'Something went wrong. Please try again.',
         error: true,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errMsg]);
     } finally {
@@ -119,40 +126,85 @@ export default function AskPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Ask LOOP</h1>
-        <p className="mt-1 text-muted-foreground">
-          Ask plain-English questions — answers are grounded in your real customer feedback
-        </p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Ask LOOP</h1>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setMessages([])} className="h-8 gap-1.5 text-xs" disabled={messages.length === 0}>
+            <Trash2 className="h-3.5 w-3.5" /> Clear chat
+          </Button>
+          <Button size="sm" onClick={() => setMessages([])} className="h-8 gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+            <Plus className="h-3.5 w-3.5" /> New chat
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-14rem)] w-full">
         {/* ── Chat panel ── */}
-        <div className="lg:col-span-2 flex flex-col h-[650px]">
-          {/* Message list */}
-          <div className="flex-1 overflow-y-auto rounded-2xl border border-border bg-card p-5 mb-4 space-y-5">
+        <div className="flex-1 overflow-y-auto rounded-2xl border border-border bg-card mb-3 relative overflow-hidden shadow-sm flex flex-col">
+            <div className="absolute inset-0 bg-primary-gradient opacity-[0.05] dark:opacity-[0.08] pointer-events-none" />
+            <div className="relative z-10 flex-1 flex flex-col p-4 space-y-4">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center select-none">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-inner">
-                  <Bot className="h-7 w-7" />
+              <div className="flex flex-col items-center justify-center h-full text-center select-none flex-1">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 dark:bg-card border border-primary/20 dark:border-border text-primary dark:text-foreground mb-3 shadow-xl shadow-primary/20 dark:shadow-sm relative overflow-hidden">
+                  <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+                  <Bot className="h-5 w-5 relative z-10" />
                 </div>
-                <h3 className="font-semibold text-foreground text-lg">Ask anything about your feedback</h3>
-                <p className="text-xs text-muted-foreground max-w-sm mt-2 leading-relaxed">
+                <h3 className="font-bold text-foreground text-3xl">Ask anything about your feedback</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mt-1.5 leading-relaxed mb-8">
                   LOOP AI searches your workspace's actual customer feedback and answers only from what it finds — no hallucinations.
                 </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl px-4">
+                  {DEFAULT_QUESTIONS.slice(0, 4).map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSend(q)}
+                      disabled={isLoading}
+                      className="group relative text-left rounded-xl border border-border/70 bg-card/50 p-4 text-sm font-medium transition-all disabled:opacity-50 overflow-hidden hover:shadow-md hover:bg-card hover:border-primary/40 leading-relaxed"
+                    >
+                      <div className="absolute inset-0 bg-primary-gradient opacity-0 group-hover:opacity-[0.06] dark:group-hover:opacity-[0.12] transition-opacity pointer-events-none" />
+                      <span className="relative z-10 group-hover:text-primary transition-colors block">{q}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                  
+                  {/* Avatar & Timestamp Header */}
+                  <div className={`flex items-center gap-2 mb-0.5 px-1 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-card border border-border/60 shadow-sm relative overflow-hidden">
+                      {msg.role === 'user' ? (
+                        <User className="h-4 w-4 text-muted-foreground/80 relative z-10" />
+                      ) : (
+                        <>
+                          <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+                          <Bot className="h-4 w-4 text-primary dark:text-foreground relative z-10" />
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-row">
+                      <span className="font-semibold text-sm text-foreground/90 tracking-tight">
+                        {msg.role === 'user' ? 'You' : 'LOOP AI'}
+                      </span>
+                      {msg.timestamp && (
+                        <span className="text-[11px] text-muted-foreground/60 font-medium">
+                          {msg.timestamp}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Bubble */}
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                       msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground font-medium'
+                        ? 'bg-gradient-to-r from-primary/95 to-primary/55 dark:from-primary dark:to-indigo-500 text-primary-foreground font-medium shadow-md shadow-primary/20'
                         : msg.error
                         ? 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400'
-                        : 'bg-muted/60 border border-border/60 text-foreground'
+                        : 'bg-card border border-border text-foreground shadow-sm'
                     }`}
                   >
                     {msg.content}
@@ -207,10 +259,9 @@ export default function AskPage() {
               ))
             )}
 
-            {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="flex items-center gap-2 rounded-2xl bg-muted/60 border border-border/60 px-4 py-2.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 rounded-2xl bg-card border border-border px-4 py-2.5 text-xs text-muted-foreground shadow-sm">
                   <Loader className="h-3.5 w-3.5 animate-spin text-primary" />
                   <span>Searching feedback & generating grounded answer…</span>
                 </div>
@@ -218,10 +269,11 @@ export default function AskPage() {
             )}
 
             <div ref={bottomRef} />
+            </div>
           </div>
 
           {/* Input */}
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <input
               ref={inputRef}
               type="text"
@@ -230,73 +282,18 @@ export default function AskPage() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
               disabled={isLoading}
-              className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all"
+              className="flex-1 rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 transition-all"
             />
             <Button
               onClick={() => handleSend()}
               disabled={!message.trim() || isLoading}
-              className="gap-2 rounded-xl px-5"
+              className="h-[42px] w-[42px] p-0 shrink-0 flex items-center justify-center rounded-xl bg-primary/90 dark:bg-card dark:border dark:border-border text-primary-foreground dark:text-foreground hover:bg-primary transition-all shadow-md shadow-primary/30 dark:shadow-sm relative overflow-hidden group"
             >
-              {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] group-hover:opacity-[0.3] pointer-events-none transition-opacity" />
+              {isLoading ? <Loader className="h-4 w-4 animate-spin relative z-10" /> : <Send className="h-4 w-4 relative z-10" />}
             </Button>
           </div>
         </div>
-
-        {/* ── Sidebar ── */}
-        <div className="space-y-5">
-          {/* Suggested questions */}
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-              Suggested Questions
-            </h2>
-            <div className="space-y-2">
-              {DEFAULT_QUESTIONS.map((q, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSend(q)}
-                  disabled={isLoading}
-                  className="w-full text-left rounded-xl border border-border/70 bg-card p-3.5 text-xs font-medium hover:bg-muted/50 hover:border-primary/40 transition-all disabled:opacity-50"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* How it works */}
-          <div className="rounded-xl border border-border bg-muted/40 p-4">
-            <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
-              <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-              How Ask LOOP Works
-            </h3>
-            <ol className="text-xs text-muted-foreground space-y-2 leading-relaxed list-none">
-              <li className="flex gap-2">
-                <span className="text-primary font-bold flex-shrink-0">1.</span>
-                Your question is matched against your workspace's feedback using keyword retrieval
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary font-bold flex-shrink-0">2.</span>
-                The top matching items are passed to the AI as grounding context
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary font-bold flex-shrink-0">3.</span>
-                The AI answers <strong>only</strong> from that context — no hallucinations
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary font-bold flex-shrink-0">4.</span>
-                Cited sources are shown so you can verify every claim
-              </li>
-            </ol>
-          </div>
-
-          {/* Powered by */}
-          <div className="rounded-xl border border-border/50 bg-card/50 p-3 text-center">
-            <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest">Powered by</p>
-            <p className="text-xs font-semibold text-foreground mt-0.5">Groq · GPT OSS 120B</p>
-            <p className="text-[10px] text-muted-foreground/60 mt-0.5">Answers grounded in your data</p>
-          </div>
-        </div>
       </div>
-    </div>
   );
 }
