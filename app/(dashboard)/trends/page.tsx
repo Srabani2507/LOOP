@@ -70,10 +70,7 @@ export default function TrendsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Theme Growth Trends</h2>
-              <ThemeGrowthChart data={chartData} />
-            </div>
+            <ThemeGrowthChart data={chartData} />
 
             <div className="space-y-4">
               <div>

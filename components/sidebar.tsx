@@ -316,8 +316,9 @@ export function Sidebar() {
           <div className="mt-auto">
             <div className="bg-card rounded-2xl p-4 space-y-2 border border-border/50">
               <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-muted/80">
-                <div className="shrink-0 h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary/80 border border-primary/20 text-sm">
-                  {initials}
+                <div className="shrink-0 h-9 w-9 rounded-full bg-primary/20 dark:bg-card flex items-center justify-center font-bold text-primary/80 dark:text-foreground border border-primary/20 dark:border-border text-sm relative overflow-hidden">
+                  <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+                  <span className="relative z-10">{initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{userName}</p>
@@ -329,9 +330,10 @@ export function Sidebar() {
                 <Link
                   href="/settings"
                   onClick={handleNavClick}
-                  className="flex items-center justify-center h-8 rounded-xl text-sm font-normal bg-primary/10 text-primary/90 hover:bg-primary/20 hover:text-primary transition-colors shadow-sm"
+                  className="group relative overflow-hidden flex items-center justify-center h-8 rounded-xl text-sm font-normal bg-primary/10 dark:bg-card text-primary/90 dark:text-foreground hover:bg-primary/20 hover:text-primary transition-colors shadow-sm dark:border dark:border-border"
                 >
-                  Profile
+                  <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.16] group-hover:opacity-[0.28] pointer-events-none transition-opacity" />
+                  <span className="relative z-10">Profile</span>
                 </Link>
                 <button
                   onClick={handleSignOut}

@@ -98,8 +98,9 @@ export function TopNavbar() {
         <div className="h-8 w-px bg-border" />
 
         <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
-          <div className="h-8 w-8 rounded-full shadow-sm bg-primary/20 text-primary border border-primary/20 font-bold text-xs flex items-center justify-center">
-            {initials}
+          <div className="h-8 w-8 rounded-full shadow-sm bg-primary/20 dark:bg-card text-primary dark:text-foreground border border-primary/20 dark:border-border font-bold text-xs flex items-center justify-center relative overflow-hidden">
+            <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
+            <span className="relative z-10">{initials}</span>
           </div>
           <div className="text-left hidden sm:block">
             <p className="text-sm font-medium">{userName}</p>
