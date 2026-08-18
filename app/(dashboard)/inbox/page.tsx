@@ -101,6 +101,14 @@ export default function InboxPage() {
   const canDelete = isAdmin;
   const showActions = canEdit || canDelete;
 
+  // Read themeId passed from Trends drill-down via sessionStorage (keeps URL clean)
+  const initialThemeId = (() => {
+    if (typeof window === 'undefined') return '';
+    const val = sessionStorage.getItem('inbox_themeFilter') ?? '';
+    if (val) sessionStorage.removeItem('inbox_themeFilter'); // consume once
+    return val;
+  })();
+
   // ── Feedback list state
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,10 +143,10 @@ export default function InboxPage() {
   const [sentimentFilter, setSentimentFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [channelFilter, setChannelFilter] = useState("");
-  const [themeFilter, setThemeFilter] = useState("");
+  const [themeFilter, setThemeFilter] = useState(initialThemeId);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!initialThemeId);
   const [themes, setThemes] = useState<ThemeOption[]>([]);
 
   // ── CSV Import state
