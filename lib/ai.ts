@@ -151,25 +151,28 @@ export async function answerQuestion(
     };
   }
 
+  // Build context with readable number labels — model references [1], [2], etc., NOT raw IDs
   const contextBlock = feedbackContext
     .map(
       (f, i) =>
-        `[${i + 1}] ID:${f.id} | Channel:${f.channel} | Sentiment:${f.sentiment ?? "UNKNOWN"} | Date:${new Date(f.createdAt).toLocaleDateString()}\n"${f.content}"`
+        `[${i + 1}] Channel:${f.channel} | Sentiment:${f.sentiment ?? "UNKNOWN"} | Date:${new Date(f.createdAt).toLocaleDateString()}\n"${f.content}"\n(internal-id:${f.id})`
     )
     .join("\n\n");
 
-  const prompt = `You are LOOP, an AI assistant for a customer feedback intelligence platform. Answer the user's question using ONLY the feedback items provided below. 
+  const prompt = `You are LOOP AI, an assistant for a customer feedback intelligence platform. Answer the user's question using ONLY the numbered feedback items provided below.
 
-IMPORTANT RULES:
-1. Answer only from the provided feedback. Do not use outside knowledge or invent data.
-2. If the provided feedback does not contain enough information to answer the question, say so clearly.
-3. Cite the specific feedback items you used (by their ID).
-4. Return a JSON object ONLY — no markdown, no explanation outside the JSON.
+CRITICAL RULES:
+1. Answer ONLY from the provided feedback. Do not use outside knowledge or invent data.
+2. Write a clear, natural prose answer (2-5 sentences). Do NOT include any database IDs, internal IDs, or the text "internal-id" in your answer.
+3. You may reference items by their number (e.g. "several customers reported...", "as noted in items 1 and 3...") but NEVER paste an ID string.
+4. If the feedback does not contain enough information to answer, say so clearly.
+5. List the internal-ids of the items you drew from in citedFeedbackIds (these are only used internally, never shown in your answer text).
+6. Return a JSON object ONLY — no markdown fences, no text outside the JSON.
 
-JSON schema to return:
+JSON schema:
 {
-  "answer": "Your answer grounded in the provided feedback (2-5 sentences, cite specific examples)",
-  "citedFeedbackIds": ["id1", "id2", ...]
+  "answer": "Plain English answer with no IDs or internal references",
+  "citedFeedbackIds": ["internal-id-of-item-1", "internal-id-of-item-3", ...]
 }
 
 User question: "${question.replace(/"/g, '\\"')}"
@@ -191,9 +194,14 @@ Return ONLY the JSON object:`;
     const result = parseJson(raw, InsightAnswerSchema);
     if (result) return result;
 
-    // Fallback: return the raw text as an answer without citations
+    // Fallback: try to extract just the "answer" field via regex before showing raw text
+    const answerMatch = raw.match(/"answer"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    const extractedAnswer = answerMatch
+      ? answerMatch[1].replace(/\\n/g, " ").replace(/\\"/g, '"')
+      : null;
+
     return {
-      answer: raw.slice(0, 500) || "Unable to parse AI response.",
+      answer: extractedAnswer || "I was unable to generate a clear answer. Please try rephrasing your question.",
       citedFeedbackIds: [],
     };
   } catch (err) {
