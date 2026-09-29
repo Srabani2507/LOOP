@@ -8,7 +8,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary-gradient text-primary-foreground hover:opacity-90 transition-opacity',
+        default: 'bg-primary/10 dark:bg-card text-primary/90 dark:text-foreground hover:bg-primary/20 hover:text-primary transition-colors shadow-sm dark:border dark:border-border relative overflow-hidden',
         outline:
           'border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
         secondary:
@@ -44,6 +44,7 @@ function Button({
   className,
   variant = 'default',
   size = 'default',
+  children,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
@@ -51,7 +52,12 @@ function Button({
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    />
+    >
+      {variant === 'default' && (
+        <span className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.16] group-hover/button:opacity-[0.28] pointer-events-none transition-opacity rounded-[inherit]" />
+      )}
+      {children}
+    </ButtonPrimitive>
   )
 }
 

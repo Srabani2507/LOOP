@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -515,14 +516,20 @@ export default function InboxPage() {
 
           <div className="flex items-center gap-2">
             <Button
-              variant={showFilters ? "default" : "outline"}
+              variant={showFilters ? "ghost" : "outline"}
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="gap-2 rounded-xl h-10"
+              className={cn(
+                "gap-2 rounded-xl h-10 group relative overflow-hidden transition-colors",
+                showFilters && "bg-primary/10 dark:bg-card text-primary/90 dark:text-foreground hover:bg-primary/20 hover:text-primary shadow-sm dark:border dark:border-border"
+              )}
             >
-              <Filter className="h-4 w-4" />
-              Filters
-              {hasActiveFilters && <span className="flex h-2 w-2 rounded-full bg-primary" />}
+              {showFilters && (
+                <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.16] group-hover:opacity-[0.28] pointer-events-none transition-opacity" />
+              )}
+              <Filter className="h-4 w-4 relative z-10" />
+              <span className="relative z-10">Filters</span>
+              {hasActiveFilters && <span className="flex h-2 w-2 rounded-full bg-primary relative z-10" />}
             </Button>
             {hasActiveFilters && (
               <Button

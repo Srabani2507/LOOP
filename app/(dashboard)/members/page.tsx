@@ -51,7 +51,7 @@ export default function MembersPage() {
     name: "",
     email: "",
     password: "",
-    role: "VIEWER" as "ADMIN" | "ANALYST" | "VIEWER",
+    role: "" as "ADMIN" | "ANALYST" | "VIEWER" | "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [modalError, setModalError] = useState("");
@@ -98,7 +98,7 @@ export default function MembersPage() {
 
       setSuccessMessage(`Successfully added ${newMember.name} to workspace.`);
       setIsModalOpen(false);
-      setNewMember({ name: "", email: "", password: "", role: "VIEWER" });
+      setNewMember({ name: "", email: "", password: "", role: "" });
       fetchMembers();
 
       setTimeout(() => setSuccessMessage(""), 4000);
@@ -188,7 +188,7 @@ export default function MembersPage() {
         {isAdmin && (
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="gap-2 bg-primary-gradient text-white shadow-md hover:opacity-95"
+            className="gap-2 shadow-md"
           >
             <UserPlus className="h-4 w-4" />
             Add Team Member
@@ -384,7 +384,7 @@ export default function MembersPage() {
               </button>
             </div>
 
-            <form onSubmit={handleAddMember} className="space-y-4 relative z-10">
+            <form onSubmit={handleAddMember} className="space-y-4 relative z-10" autoComplete="off">
               {modalError && (
                 <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs font-medium text-destructive dark:text-red-400 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
@@ -403,7 +403,7 @@ export default function MembersPage() {
                     required
                     value={newMember.name}
                     onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                    placeholder="Rupak Sarkar"
+                    placeholder="Enter the Full Name"
                     className="pl-10 h-10 rounded-xl bg-background/60 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
@@ -421,7 +421,8 @@ export default function MembersPage() {
                     required
                     value={newMember.email}
                     onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                    placeholder="rupaksarkar1102@gmail.com"
+                    placeholder="Enter the email"
+                    autoComplete="off"
                     className="pl-10 h-10 rounded-xl bg-background/60 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
@@ -440,7 +441,8 @@ export default function MembersPage() {
                     minLength={8}
                     value={newMember.password}
                     onChange={(e) => setNewMember({ ...newMember, password: e.target.value })}
-                    placeholder="Minimum 8 characters"
+                    placeholder="Enter the password"
+                    autoComplete="new-password"
                     className="pl-10 h-10 rounded-xl bg-background/60 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
@@ -452,6 +454,7 @@ export default function MembersPage() {
                   Assign RBAC Role
                 </label>
                 <select
+                  required
                   value={newMember.role}
                   onChange={(e) =>
                     setNewMember({
@@ -461,6 +464,7 @@ export default function MembersPage() {
                   }
                   className="w-full h-10 rounded-xl border border-border/80 bg-background/60 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer font-medium"
                 >
+                  <option value="" disabled hidden>Choose any user type</option>
                   <option value="VIEWER">VIEWER (Read-only)</option>
                   <option value="ANALYST">ANALYST (Create/Edit feedback & reports)</option>
                   <option value="ADMIN">ADMIN (Full workspace access)</option>
@@ -480,7 +484,7 @@ export default function MembersPage() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="h-10 rounded-xl bg-primary-gradient text-white font-semibold text-xs px-5 shadow-lg shadow-primary/25 transition-all hover:opacity-95 active:scale-[0.99] flex items-center gap-2"
+                  className="h-10 rounded-xl bg-primary-gradient text-white font-semibold text-xs px-5 shadow-lg shadow-primary/25 transition-all hover:opacity-95 hover:text-white active:scale-[0.99] flex items-center gap-2"
                 >
                   {submitting ? (
                     <>

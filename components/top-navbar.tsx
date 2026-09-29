@@ -1,23 +1,11 @@
 'use client'
 
-import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react'
+import { Bell, Sun, Moon, Menu } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useSidebar } from '@/lib/sidebar-context'
-import { useSession } from 'next-auth/react'
 
 export function TopNavbar() {
-  const sessionData = useSession()
-  const session = sessionData?.data
-  const userName = session?.user?.name || "User"
-  const userRole = (session?.user as any)?.role || "Member"
-  const initials = userName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "U"
-
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [mounted, setMounted] = useState(false)
   const { toggle } = useSidebar()
@@ -60,15 +48,6 @@ export function TopNavbar() {
           <Image src="/LOOP-logo.svg" alt="LOOP Logo" width={60} height={60} className="h-12 w-auto relative z-10" priority />
           <Image src="/LOOP-text.svg" alt="LOOP Text" width={100} height={28} className="h-14 w-auto -ml-8" priority />
         </div>
-
-        <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search feedback..."
-            className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-4 text-sm transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          />
-        </div>
       </div>
 
       <div className="relative z-10 flex items-center gap-2 lg:gap-3">
@@ -90,23 +69,6 @@ export function TopNavbar() {
 
         <button className="relative rounded-lg p-2 hover:bg-muted" aria-label="Notifications">
           <Bell className="h-5 w-5 text-foreground/60" />
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
-            3
-          </span>
-        </button>
-
-        <div className="h-8 w-px bg-border" />
-
-        <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
-          <div className="h-8 w-8 rounded-full shadow-sm bg-primary/20 dark:bg-card text-primary dark:text-foreground border border-primary/20 dark:border-border font-bold text-xs flex items-center justify-center relative overflow-hidden">
-            <div className="hidden dark:block absolute inset-0 bg-primary-gradient opacity-[0.22] pointer-events-none" />
-            <span className="relative z-10">{initials}</span>
-          </div>
-          <div className="text-left hidden sm:block">
-            <p className="text-sm font-medium">{userName}</p>
-            <p className="text-xs text-muted-foreground capitalize">{userRole.toLowerCase()}</p>
-          </div>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
     </header>

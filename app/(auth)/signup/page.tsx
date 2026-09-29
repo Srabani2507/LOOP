@@ -205,7 +205,7 @@ export default function SignupPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="h-10 pl-10 rounded-xl bg-background/50 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        placeholder="Jane Doe"
+                        placeholder="Enter the Full Name"
                       />
                     </div>
                   </div>
@@ -226,7 +226,7 @@ export default function SignupPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="h-10 pl-10 rounded-xl bg-background/50 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        placeholder="you@company.com"
+                        placeholder="Enter the email"
                       />
                     </div>
                   </div>
@@ -247,7 +247,7 @@ export default function SignupPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="h-10 pl-10 pr-10 rounded-xl bg-background/50 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        placeholder="Minimum 8 characters"
+                        placeholder="Enter the password"
                         minLength={8}
                       />
                       <button
@@ -275,7 +275,7 @@ export default function SignupPage() {
                         value={workspaceName}
                         onChange={(e) => setWorkspaceName(e.target.value)}
                         className="h-10 pl-10 rounded-xl bg-background/50 border-border/80 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
-                        placeholder="Acme Corp"
+                        placeholder="Enter the Workspace Name"
                       />
                     </div>
                   </div>
