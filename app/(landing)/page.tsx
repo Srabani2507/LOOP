@@ -228,28 +228,10 @@ function PricingCard({ name, price, description, features, highlighted, delay }:
 ───────────────────────────────────────────── */
 export default function LandingPage() {
 
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  const [mounted, setMounted] = useState(false)
-
   useEffect(() => {
-    setMounted(true)
-    const isDark = document.documentElement.classList.contains('dark')
-    setTheme(isDark ? 'dark' : 'light')
+    document.documentElement.classList.add('dark')
+    document.documentElement.classList.remove('light')
   }, [])
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(nextTheme)
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('light')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.documentElement.classList.add('light')
-      localStorage.setItem('theme', 'light')
-    }
-  }
 
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -354,26 +336,9 @@ export default function LandingPage() {
         <div className="hidden md:flex items-center gap-8 text-sm text-foreground/60">
           <a href="#features" className="hover:text-foreground transition-colors duration-200">Features</a>
           <a href="#how-it-works" className="hover:text-foreground transition-colors duration-200">How it works</a>
-          <a href="#pricing" className="hover:text-foreground transition-colors duration-200">Pricing</a>
           <a href="#testimonials" className="hover:text-foreground transition-colors duration-200">Reviews</a>
         </div>
         <div className="flex items-center gap-3">
-          
-          <button
-            onClick={toggleTheme}
-            className="rounded-lg p-2 hover:bg-muted text-foreground/60 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {mounted ? (
-              theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )
-            ) : (
-              <div className="h-5 w-5" />
-            )}
-          </button>
 
           <Link href="/login" className="text-sm text-foreground/70 hover:text-foreground transition-colors px-3 py-1.5">
             Sign in
@@ -717,41 +682,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
-      <section
-        id="pricing"
-        className="py-24 px-6 relative overflow-hidden"
-        style={{ background: 'linear-gradient(180deg, transparent, rgba(107,53,196,0.05) 50%, transparent)' }}
-      >
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <p className="text-sm font-semibold uppercase tracking-widest text-purple-400 mb-3">Simple pricing</p>
-            <h2 className="text-4xl font-black text-foreground">Start free, scale as you grow</h2>
-          </motion.div>
-          <div className="grid md:grid-cols-3 gap-5">
-            <PricingCard
-              name="Starter" price="Free" delay={0.1}
-              description="Perfect for small teams getting started."
-              features={['1 workspace', 'Up to 500 feedback items', 'AI classification', 'Basic analytics', 'Ask LOOP (10 queries/day)']}
-            />
-            <PricingCard
-              name="Growth" price="$49" highlighted delay={0.2}
-              description="For growing teams with real feedback volume."
-              features={['3 workspaces', 'Unlimited feedback', 'Advanced AI trends', 'VoC reports', 'CSV bulk upload', 'RBAC (3 roles)', 'Priority support']}
-            />
-            <PricingCard
-              name="Enterprise" price="Custom" delay={0.3}
-              description="Tailored for large organizations."
-              features={['Unlimited workspaces', 'Dedicated infrastructure', 'Custom integrations', 'SSO & advanced security', 'SLA guarantee', 'Onboarding support']}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* ── CTA BANNER ── */}
       <section className="py-24 px-6">
